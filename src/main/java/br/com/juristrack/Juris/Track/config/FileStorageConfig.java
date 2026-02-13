@@ -14,4 +14,6 @@ public class FileStorageConfig {
     private String storagePath;
 
     private String storageSize;
+
+    private String photoFolder;
 }

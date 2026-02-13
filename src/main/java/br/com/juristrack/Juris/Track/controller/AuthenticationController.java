@@ -6,8 +6,6 @@ import br.com.juristrack.Juris.Track.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +20,8 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authentication(@RequestBody @Valid AuthenticationRequest authenticationRequest) {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(authenticationRequest.email(), authenticationRequest.password());
 
-        AuthenticationResponse authenticationResponse = authenticationService.authentication(authentication);
+        AuthenticationResponse authenticationResponse = authenticationService.authentication(authenticationRequest);
 
         return ResponseEntity.ok().body(authenticationResponse);
     }

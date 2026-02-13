@@ -1,10 +1,7 @@
 package br.com.juristrack.Juris.Track.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -39,5 +36,10 @@ public class Lawyer {
     private String phone;
 
     @Column(name = "profile_photo")
-    private String profilePhoto;
+    private String profilePhotoPath;
+
+    public void linkUserAccount(UserAccount userAccount) {
+        this.setUserAccount(userAccount);
+        userAccount.setLawyer(this);
+    }
 }

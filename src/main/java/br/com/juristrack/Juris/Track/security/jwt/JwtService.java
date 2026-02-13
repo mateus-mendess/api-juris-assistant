@@ -1,5 +1,6 @@
 package br.com.juristrack.Juris.Track.security.jwt;
 
+import br.com.juristrack.Juris.Track.security.user.UserAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +22,8 @@ public class JwtService {
         Instant active = Instant.now();
         Long expired = 10800L;
 
+        UserAuthentication userAuthentication = (UserAuthentication) authentication.getPrincipal();
+
         String scopes = authentication.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
@@ -30,8 +33,8 @@ public class JwtService {
                 .issuer("Juris.exe")
                 .issuedAt(active)
                 .expiresAt(active.plusSeconds(expired))
-                .subject(authentication.getName())
-                .claim("", "")
+                .subject(userAuthentication.getId().toString())
+                .claim("scope", scopes)
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

@@ -1,21 +1,31 @@
 package br.com.juristrack.Juris.Track.security.user;
 
 import br.com.juristrack.Juris.Track.model.entity.UserAccount;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
+
 
 @RequiredArgsConstructor
 public class UserAuthentication implements UserDetails {
 
     private final UserAccount userAccount;
 
+    public UUID getId() {
+        return userAccount.getId();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return userAccount.getRoles()
+                .stream()
+                .map(roles -> new SimpleGrantedAuthority(roles.getName()))
+                .toList();
     }
 
     @Override

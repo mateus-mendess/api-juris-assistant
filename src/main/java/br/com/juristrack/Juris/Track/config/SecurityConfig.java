@@ -1,6 +1,8 @@
 package br.com.juristrack.Juris.Track.config;
 
-import jakarta.servlet.FilterChain;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +16,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.interfaces.RSAPrivateKey;
@@ -26,10 +30,10 @@ import java.security.interfaces.RSAPublicKey;
 public class SecurityConfig {
 
     @Value("${jwt.private.key}")
-    private final RSAPrivateKey privateKey;
+    private RSAPrivateKey privateKey;
 
-    @Value("{jwt.public.key}")
-    private final RSAPublicKey publicKey;
+    @Value("${jwt.public.key}")
+    private RSAPublicKey publicKey;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -47,6 +51,14 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder() {
+        var jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
+        var jwkSet = new ImmutableJWKSet<>(new JWKSet(jwk));
+
+        return new NimbusJwtEncoder(jwkSet);
     }
 
     @Bean
