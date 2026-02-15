@@ -1,0 +1,2 @@
+ALTER TABLE user_account
+ADD COLUMN created_at TIMESTAMP NOT NULL;

@@ -4,10 +4,7 @@ import br.com.juristrack.Juris.Track.dto.request.LawyerRequest;
 import br.com.juristrack.Juris.Track.dto.request.LawyerUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.LawyerResponse;
 import br.com.juristrack.Juris.Track.model.entity.Lawyer;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -18,6 +15,8 @@ public interface LawyerMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void toUpdateLawyer(LawyerUpdateRequest lawyerUpdateRequest, String profilePhotoPath, @MappingTarget Lawyer lawyer);
 
+    @Mapping(target = "createdAt", source = "userAccount.createdAt")
+    @Mapping(target = "email", source = "userAccount.email")
     LawyerResponse toLawyerResponse(Lawyer lawyer);
 
     List<LawyerResponse> toLawyersResponse(List<Lawyer> lawyers);

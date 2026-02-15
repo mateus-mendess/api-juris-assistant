@@ -63,6 +63,10 @@ public class LawyerService {
         Lawyer lawyer = lawyerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
+        if (lawyerRepository.existsByPhone(lawyerUpdateRequest.phone())) {
+            throw new PhoneAlreadyExistsException(lawyerUpdateRequest.phone(), "phone");
+        }
+
         String profilePhotoPath = fileStorageService.update(profilePhoto, lawyer.getProfilePhotoPath());
         lawyerMapper.toUpdateLawyer(lawyerUpdateRequest, profilePhotoPath, lawyer);
     }
@@ -80,15 +84,15 @@ public class LawyerService {
 
     private void validateRegistrationData(LawyerRequest lawyerRequest) {
         if (lawyerRepository.existsByCpf(lawyerRequest.cpf())) {
-            throw new CpfAlreadyExistsException(lawyerRequest.cpf());
+            throw new CpfAlreadyExistsException(lawyerRequest.cpf(), "CPF");
         }
 
         if (lawyerRepository.existsByOabNumberAndOabState(lawyerRequest.oabNumber(), lawyerRequest.oabState())) {
-            throw new OabAlreadyExistsException(lawyerRequest.oabNumber(), lawyerRequest.oabState());
+            throw new OabAlreadyExistsException(lawyerRequest.oabNumber(), lawyerRequest.oabState(), "OAB");
         }
 
         if (lawyerRepository.existsByPhone(lawyerRequest.phone())) {
-            throw new PhoneAlreadyExistsException(lawyerRequest.phone());
+            throw new PhoneAlreadyExistsException(lawyerRequest.phone(), "phone");
         }
     }
 }

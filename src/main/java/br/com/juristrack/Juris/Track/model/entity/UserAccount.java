@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,9 @@ public class UserAccount {
 
     @Column(name = "is_enable")
     private Boolean isEnable = true;
+
+    @Column(name = "created_at")
+    private Instant createdAt = Instant.now();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

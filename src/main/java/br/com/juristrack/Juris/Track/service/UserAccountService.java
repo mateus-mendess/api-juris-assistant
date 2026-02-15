@@ -41,7 +41,7 @@ public class UserAccountService {
 
     private void validateRegistrationData(UserAccountRequest userAccountRequest) {
         if (userAccountRepository.existsByEmail(userAccountRequest.email())) {
-            throw new EmailAlreadyExistsException(userAccountRequest.email());
+            throw new EmailAlreadyExistsException(userAccountRequest.email(), "email");
         }
     }
 }
