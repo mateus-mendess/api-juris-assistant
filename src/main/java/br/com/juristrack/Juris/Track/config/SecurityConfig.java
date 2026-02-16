@@ -1,5 +1,6 @@
 package br.com.juristrack.Juris.Track.config;
 
+import br.com.juristrack.Juris.Track.handler.AuthSuccessHandler;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -35,6 +37,19 @@ public class SecurityConfig {
     @Value("${jwt.public.key}")
     private RSAPublicKey publicKey;
 
+    @Order(1)
+    @Bean
+    public SecurityFilterChain filterChainOAuthClient(HttpSecurity httpSecurity, AuthSuccessHandler authSuccessHandler) throws Exception {
+    return httpSecurity.securityMatcher("/login/**", "/oauth2/**")
+            .authorizeHttpRequests(auth -> auth
+                            .anyRequest().authenticated()
+                    )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            .oauth2Login(authHandler -> authHandler.successHandler(authSuccessHandler))
+            .build();
+    }
+
+    @Order(2)
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.securityMatcher("/api/**")
@@ -43,7 +58,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/lawyers").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().authenticated()
+                )
                 .oauth2ResourceServer(auth -> auth.jwt(Customizer.withDefaults()))
                 .build();
     }

@@ -2,16 +2,14 @@ package br.com.juristrack.Juris.Track.model.entity;
 
 import br.com.juristrack.Juris.Track.enums.Provider;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
@@ -33,9 +31,11 @@ public class UserAccount {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @Builder.Default
     @Column(name = "is_enable")
     private Boolean isEnable = true;
 
+    @Builder.Default
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();
 
