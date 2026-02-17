@@ -2,7 +2,7 @@ package br.com.juristrack.Juris.Track.service;
 
 import br.com.juristrack.Juris.Track.dto.request.AuthenticationRequest;
 import br.com.juristrack.Juris.Track.dto.response.AuthenticationResponse;
-import br.com.juristrack.Juris.Track.model.entity.UserAccount;
+import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.security.jwt.JwtService;
 import br.com.juristrack.Juris.Track.security.user.UserAuthentication;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class AuthenticationService {
         OidcUser oidcUser = (OidcUser) authentication.getPrincipal();
 
         UserAuthentication userAuthentication = new UserAuthentication(
-                userAccountService.findOrCreateFromGoogle(oidcUser));
+                userAccountService.findOrCreateOfGoogle(oidcUser, RolesType.ROLE_LAWYER));
 
         return jwtService.generateToken(new UsernamePasswordAuthenticationToken(userAuthentication, userAuthentication.getAuthorities()));
     }

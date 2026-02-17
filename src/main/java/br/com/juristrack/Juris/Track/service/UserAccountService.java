@@ -10,10 +10,7 @@ import br.com.juristrack.Juris.Track.model.entity.Role;
 import br.com.juristrack.Juris.Track.model.entity.UserAccount;
 import br.com.juristrack.Juris.Track.model.repository.RoleRepository;
 import br.com.juristrack.Juris.Track.model.repository.UserAccountRepository;
-import br.com.juristrack.Juris.Track.security.user.UserAuthentication;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
@@ -45,8 +42,8 @@ public class UserAccountService {
         return userAccount;
     }
 
-    public UserAccount findOrCreateFromGoogle(OidcUser oidcUser) {
-        Role role = roleRepository.findByName(RolesType.ROLE_LAWYER.name())
+    public UserAccount findOrCreateOfGoogle(OidcUser oidcUser, RolesType rolesType) {
+        Role role = roleRepository.findByName(rolesType.name())
                 .orElseThrow(() -> new NotFoundException("role not found."));
 
         return userAccountRepository.findByEmail(oidcUser.getEmail())
