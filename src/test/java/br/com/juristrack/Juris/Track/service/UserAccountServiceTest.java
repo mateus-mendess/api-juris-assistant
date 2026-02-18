@@ -11,11 +11,9 @@ import br.com.juristrack.Juris.Track.model.entity.UserAccount;
 import br.com.juristrack.Juris.Track.model.repository.RoleRepository;
 import br.com.juristrack.Juris.Track.model.repository.UserAccountRepository;
 import br.com.juristrack.Juris.Track.support.UserAccountSupport;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -116,7 +114,7 @@ class UserAccountServiceTest {
             when(userAccountRepository.findByEmail(oidcUser.getEmail())).thenReturn(Optional.empty());
             when(userAccountRepository.save(any(UserAccount.class))).thenReturn(entity);
 
-            UserAccount userAccount = assertDoesNotThrow(() -> userAccountService.findOrCreateOfGoogle(oidcUser, RolesType.ROLE_LAWYER));
+            UserAccount userAccount = assertDoesNotThrow(() -> userAccountService.loadOrCreateByEmail(oidcUser.getEmail(), RolesType.ROLE_LAWYER));
 
             assertEquals(oidcUser.getEmail(), userAccount.getEmail());
         }
@@ -127,11 +125,12 @@ class UserAccountServiceTest {
             OidcUser oidcUser = mock(OidcUser.class);
             RolesType rolesType = RolesType.ROLE_MODERATOR;
 
+            when(oidcUser.getEmail()).thenReturn("teste@gmail.com");
             when(roleRepository.findByName(rolesType.name())).thenReturn(Optional.empty());
 
             //Act & Assert
             var exception = assertThrows(NotFoundException.class, () ->
-                    userAccountService.findOrCreateOfGoogle(oidcUser, rolesType));
+                    userAccountService.loadOrCreateByEmail(oidcUser.getEmail(), rolesType));
 
             assertEquals("role not found.", exception.getMessage());
         }

@@ -42,14 +42,14 @@ public class UserAccountService {
         return userAccount;
     }
 
-    public UserAccount findOrCreateOfGoogle(OidcUser oidcUser, RolesType rolesType) {
+    public UserAccount loadOrCreateByEmail(String email, RolesType rolesType) {
         Role role = roleRepository.findByName(rolesType.name())
                 .orElseThrow(() -> new NotFoundException("role not found."));
 
-        return userAccountRepository.findByEmail(oidcUser.getEmail())
+        return userAccountRepository.findByEmail(email)
                 .orElseGet(() -> userAccountRepository.save(
                         UserAccount.builder()
-                                .email(oidcUser.getEmail())
+                                .email(email)
                                 .provider(Provider.GOOGLE)
                                 .roles(Set.of(role))
                                 .build()

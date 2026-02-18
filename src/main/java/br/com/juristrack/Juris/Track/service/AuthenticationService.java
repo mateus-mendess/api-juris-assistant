@@ -32,7 +32,7 @@ public class AuthenticationService {
         OidcUser oidcUser = (OidcUser) authentication.getPrincipal();
 
         UserAuthentication userAuthentication = new UserAuthentication(
-                userAccountService.findOrCreateOfGoogle(oidcUser, RolesType.ROLE_LAWYER));
+                userAccountService.loadOrCreateByEmail(oidcUser.getEmail(), RolesType.ROLE_LAWYER));
 
         return jwtService.generateToken(new UsernamePasswordAuthenticationToken(userAuthentication, userAuthentication.getAuthorities()));
     }
