@@ -1,7 +1,7 @@
 package br.com.juristrack.Juris.Track.service;
 
 import br.com.juristrack.Juris.Track.dto.request.UserAccountRequest;
-import br.com.juristrack.Juris.Track.enums.Provider;
+import br.com.juristrack.Juris.Track.enums.AuthProvider;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.EmailAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
@@ -12,7 +12,6 @@ import br.com.juristrack.Juris.Track.model.repository.RoleRepository;
 import br.com.juristrack.Juris.Track.model.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,32 +27,18 @@ public class UserAccountService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserAccount create(UserAccountRequest userAccountRequest, Provider provider, RolesType rolesType) {
+    public UserAccount create(UserAccountRequest userAccountRequest, AuthProvider authProvider, RolesType rolesType) {
         validateRegistrationData(userAccountRequest);
 
         Role role = roleRepository.findByName(rolesType.name())
                 .orElseThrow(() -> new NotFoundException("role not found."));
 
-        UserAccount userAccount = userAccountMapper.toUserAccount(userAccountRequest, provider);
+        UserAccount userAccount = userAccountMapper.toUserAccount(userAccountRequest, authProvider);
 
         userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
         userAccount.getRoles().add(role);
 
         return userAccount;
-    }
-
-    public UserAccount loadOrCreateByEmail(String email, RolesType rolesType) {
-        Role role = roleRepository.findByName(rolesType.name())
-                .orElseThrow(() -> new NotFoundException("role not found."));
-
-        return userAccountRepository.findByEmail(email)
-                .orElseGet(() -> userAccountRepository.save(
-                        UserAccount.builder()
-                                .email(email)
-                                .provider(Provider.GOOGLE)
-                                .roles(Set.of(role))
-                                .build()
-                ));
     }
 
     private void validateRegistrationData(UserAccountRequest userAccountRequest) {

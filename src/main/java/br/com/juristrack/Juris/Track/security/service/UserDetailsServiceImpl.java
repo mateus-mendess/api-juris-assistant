@@ -1,6 +1,7 @@
-package br.com.juristrack.Juris.Track.security.user;
+package br.com.juristrack.Juris.Track.security.service;
 
 import br.com.juristrack.Juris.Track.model.repository.UserAccountRepository;
+import br.com.juristrack.Juris.Track.security.user.UserAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

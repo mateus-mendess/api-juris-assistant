@@ -1,6 +1,6 @@
 package br.com.juristrack.Juris.Track.enums;
 
-public enum Provider {
+public enum AuthProvider {
     LOCAL,
     GOOGLE
 }

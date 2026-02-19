@@ -3,7 +3,7 @@ package br.com.juristrack.Juris.Track.service;
 import br.com.juristrack.Juris.Track.dto.request.LawyerRequest;
 import br.com.juristrack.Juris.Track.dto.request.LawyerUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.LawyerResponse;
-import br.com.juristrack.Juris.Track.enums.Provider;
+import br.com.juristrack.Juris.Track.enums.AuthProvider;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
@@ -133,7 +133,7 @@ class LawyerServiceTest {
             when(lawyerRepository.existsByPhone(lawyerRequest.phone())).thenReturn(false);
             when(lawyerRepository.existsByOabNumberAndOabState(lawyerRequest.oabNumber(), lawyerRequest.oabState())).thenReturn(false);
             when(lawyerRepository.existsByCpf(lawyerRequest.cpf())).thenReturn(false);
-            when(userAccountService.create(eq(lawyerRequest.userAccountRequest()), any(Provider.class), any(RolesType.class))).thenReturn(userAccount);
+            when(userAccountService.create(eq(lawyerRequest.userAccountRequest()), any(AuthProvider.class), any(RolesType.class))).thenReturn(userAccount);
             when(fileStorageService.save(photo)).thenReturn(photoString);
             when(lawyerMapper.toLawyer(eq(lawyerRequest), any(String.class))).thenReturn(lawyer);
             when(lawyerRepository.save(any(Lawyer.class))).thenReturn(lawyer);
@@ -142,7 +142,7 @@ class LawyerServiceTest {
             //Act & Assert
             var response = assertDoesNotThrow(() -> lawyerService.create(lawyerRequest, photo));
 
-            verify(userAccountService).create(lawyerRequest.userAccountRequest(), Provider.LOCAL, RolesType.ROLE_LAWYER);
+            verify(userAccountService).create(lawyerRequest.userAccountRequest(), AuthProvider.LOCAL, RolesType.ROLE_LAWYER);
             verify(lawyerMapper).toLawyer(lawyerRequest, photoString);
             verify(lawyerRepository).save(lawyerArgumentCaptor.capture());
 

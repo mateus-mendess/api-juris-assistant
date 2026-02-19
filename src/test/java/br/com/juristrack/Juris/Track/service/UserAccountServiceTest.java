@@ -1,7 +1,7 @@
 package br.com.juristrack.Juris.Track.service;
 
 import br.com.juristrack.Juris.Track.dto.request.UserAccountRequest;
-import br.com.juristrack.Juris.Track.enums.Provider;
+import br.com.juristrack.Juris.Track.enums.AuthProvider;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.EmailAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
@@ -54,13 +54,13 @@ class UserAccountServiceTest {
 
             when(userAccountRepository.existsByEmail(request.email())).thenReturn(false);
             when(roleRepository.findByName(RolesType.ROLE_LAWYER.name())).thenReturn(Optional.of(role));
-            when(userAccountMapper.toUserAccount(request, Provider.LOCAL)).thenReturn(entity);
+            when(userAccountMapper.toUserAccount(request, AuthProvider.LOCAL)).thenReturn(entity);
             when(passwordEncoder.encode(request.password())).thenReturn("encodePassword");
 
             //Act & Assert
-            var userAccount = assertDoesNotThrow(() -> userAccountService.create(request, Provider.LOCAL, RolesType.ROLE_LAWYER));
+            var userAccount = assertDoesNotThrow(() -> userAccountService.create(request, AuthProvider.LOCAL, RolesType.ROLE_LAWYER));
 
-            verify(userAccountMapper).toUserAccount(request, Provider.LOCAL);
+            verify(userAccountMapper).toUserAccount(request, AuthProvider.LOCAL);
 
             assertEquals(request.email(), userAccount.getEmail());
             assertNotNull(userAccount.getRoles());
@@ -75,10 +75,10 @@ class UserAccountServiceTest {
 
             //Act e Assert
             assertThrows(EmailAlreadyExistsException.class,
-                    () -> userAccountService.create(request, Provider.LOCAL, RolesType.ROLE_LAWYER));
+                    () -> userAccountService.create(request, AuthProvider.LOCAL, RolesType.ROLE_LAWYER));
 
             verify(roleRepository, times(0)).findByName(RolesType.ROLE_LAWYER.name());
-            verify(userAccountMapper, times(0)).toUserAccount(request, Provider.LOCAL);
+            verify(userAccountMapper, times(0)).toUserAccount(request, AuthProvider.LOCAL);
         }
 
         @Test
@@ -91,49 +91,11 @@ class UserAccountServiceTest {
 
             //Act e Assert
             var exception = assertThrows(NotFoundException.class,
-                    () -> userAccountService.create(request, Provider.LOCAL, rolesType));
+                    () -> userAccountService.create(request, AuthProvider.LOCAL, rolesType));
 
-            verify(userAccountMapper, times(0)).toUserAccount(any(UserAccountRequest.class), any(Provider.class));
-
-            assertEquals("role not found.", exception.getMessage());
-        }
-    }
-
-    @Nested
-    class CreateOfGoogle {
-        @Test
-        void should_create_of_google_when_not_exists_in_db() {
-            //Arrange
-            OidcUser oidcUser = mock(OidcUser.class);
-            UserAccount entity = UserAccountSupport.validEntity();
-            Role role = new Role();
-
-            //Act & Assert
-            when(oidcUser.getEmail()).thenReturn("teste@gmail.com");
-            when(roleRepository.findByName(RolesType.ROLE_LAWYER.name())).thenReturn(Optional.of(role));
-            when(userAccountRepository.findByEmail(oidcUser.getEmail())).thenReturn(Optional.empty());
-            when(userAccountRepository.save(any(UserAccount.class))).thenReturn(entity);
-
-            UserAccount userAccount = assertDoesNotThrow(() -> userAccountService.loadOrCreateByEmail(oidcUser.getEmail(), RolesType.ROLE_LAWYER));
-
-            assertEquals(oidcUser.getEmail(), userAccount.getEmail());
-        }
-
-        @Test
-        void should_throw_NotFoundException_when_role_not_exists_in_db() {
-            //Arrange
-            OidcUser oidcUser = mock(OidcUser.class);
-            RolesType rolesType = RolesType.ROLE_MODERATOR;
-
-            when(oidcUser.getEmail()).thenReturn("teste@gmail.com");
-            when(roleRepository.findByName(rolesType.name())).thenReturn(Optional.empty());
-
-            //Act & Assert
-            var exception = assertThrows(NotFoundException.class, () ->
-                    userAccountService.loadOrCreateByEmail(oidcUser.getEmail(), rolesType));
+            verify(userAccountMapper, times(0)).toUserAccount(any(UserAccountRequest.class), any(AuthProvider.class));
 
             assertEquals("role not found.", exception.getMessage());
         }
     }
-
 }

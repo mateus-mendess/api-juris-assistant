@@ -3,7 +3,7 @@ package br.com.juristrack.Juris.Track.service;
 import br.com.juristrack.Juris.Track.dto.request.LawyerRequest;
 import br.com.juristrack.Juris.Track.dto.request.LawyerUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.LawyerResponse;
-import br.com.juristrack.Juris.Track.enums.Provider;
+import br.com.juristrack.Juris.Track.enums.AuthProvider;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
@@ -46,7 +46,7 @@ public class LawyerService {
     public LawyerResponse create(LawyerRequest lawyerRequest, MultipartFile photo) {
         validateRegistrationData(lawyerRequest);
 
-        UserAccount userAccount = userAccountService.create(lawyerRequest.userAccountRequest(), Provider.LOCAL, RolesType.ROLE_LAWYER);
+        UserAccount userAccount = userAccountService.create(lawyerRequest.userAccountRequest(), AuthProvider.LOCAL, RolesType.ROLE_LAWYER);
 
         String profilePhoto = fileStorageService.save(photo);
 

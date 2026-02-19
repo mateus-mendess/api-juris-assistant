@@ -1,6 +1,6 @@
 package br.com.juristrack.Juris.Track.model.entity;
 
-import br.com.juristrack.Juris.Track.enums.Provider;
+import br.com.juristrack.Juris.Track.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +29,8 @@ public class UserAccount {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Provider provider;
+    @Column(name = "provider")
+    private AuthProvider authProvider;
 
     @Builder.Default
     @Column(name = "is_enable")
