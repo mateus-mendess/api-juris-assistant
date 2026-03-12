@@ -15,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,28 +35,34 @@ public class LawyerController {
     }
 
     @PostMapping
-    public ResponseEntity<LawyerResponse> create(@RequestPart("lawyer request") @Valid LawyerRequest lawyerRequest,
-                                                 @RequestPart(name = "photo", required = false) MultipartFile photo) {
-
-        LawyerResponse lawyerResponse = lawyerService.create(lawyerRequest, photo);
+    public ResponseEntity<LawyerResponse> create(@RequestBody @Valid LawyerRequest lawyerRequest) {
+        LawyerResponse lawyerResponse = lawyerService.create(lawyerRequest);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lawyerResponse.id()).toUri();
 
         return ResponseEntity.created(uri).body(lawyerResponse);
     }
 
+    @PostMapping("/{id}/photo")
+    public ResponseEntity<Void> uploadPhoto(@PathVariable UUID id, @RequestParam(name = "filePhoto", required = false) MultipartFile filePhoto) {
+
+        lawyerService.uploadPhoto(id, filePhoto);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping
-    public ResponseEntity update(@RequestPart(value = "lawyer update request", required = false) @Valid LawyerUpdateRequest lawyerUpdateRequest,
+    public ResponseEntity<Void> update(@RequestPart(value = "lawyer update request", required = false) @Valid LawyerUpdateRequest lawyerUpdateRequest,
                                  @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto,
                                  @AuthenticationPrincipal Jwt jwt) {
 
-        lawyerService.update(lawyerUpdateRequest, profilePhoto, jwt);
+        lawyerService.update(lawyerUpdateRequest, jwt);
 
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
-    public ResponseEntity deleteById(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Void> deleteById(@AuthenticationPrincipal Jwt jwt) {
         lawyerService.delete(jwt);
 
         return ResponseEntity.noContent().build();

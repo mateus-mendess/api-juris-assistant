@@ -4,6 +4,7 @@ import br.com.juristrack.Juris.Track.dto.request.LawyerRequest;
 import br.com.juristrack.Juris.Track.dto.request.LawyerUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.LawyerResponse;
 import br.com.juristrack.Juris.Track.enums.AuthProvider;
+import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
@@ -43,21 +44,31 @@ public class LawyerService {
     }
 
     @Transactional
-    public LawyerResponse create(LawyerRequest lawyerRequest, MultipartFile photo) {
+    public LawyerResponse create(LawyerRequest lawyerRequest) {
         validateRegistrationData(lawyerRequest);
 
         UserAccount userAccount = userAccountService.create(lawyerRequest.userAccountRequest(), AuthProvider.LOCAL, RolesType.ROLE_LAWYER);
 
-        String profilePhoto = fileStorageService.save(photo);
-
-        Lawyer lawyer = lawyerMapper.toLawyer(lawyerRequest, profilePhoto);
+        Lawyer lawyer = lawyerMapper.toLawyer(lawyerRequest);
         lawyer.linkUserAccount(userAccount);
 
         return lawyerMapper.toLawyerResponse(lawyerRepository.save(lawyer));
     }
 
     @Transactional
-    public void update(LawyerUpdateRequest lawyerUpdateRequest, MultipartFile profilePhoto, Jwt jwt) {
+    public void uploadPhoto(UUID id, MultipartFile filePhoto) {
+        Lawyer lawyer = lawyerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found."));
+
+        String relativePath = fileStorageService.save(filePhoto, FileType.AVATAR);
+
+        lawyer.setProfilePhotoPath(relativePath);
+
+        lawyerRepository.save(lawyer);
+    }
+
+    @Transactional
+    public void update(LawyerUpdateRequest lawyerUpdateRequest, Jwt jwt) {
         UUID id = UUID.fromString(jwt.getSubject());
 
         Lawyer lawyer = lawyerRepository.findById(id)
@@ -67,8 +78,7 @@ public class LawyerService {
             throw new PhoneAlreadyExistsException(lawyerUpdateRequest.phone(), "phone");
         }
 
-        String profilePhotoPath = fileStorageService.update(profilePhoto, lawyer.getProfilePhotoPath());
-        lawyerMapper.toUpdateLawyer(lawyerUpdateRequest, profilePhotoPath, lawyer);
+        lawyerMapper.toUpdateLawyer(lawyerUpdateRequest, lawyer);
     }
 
     @Transactional

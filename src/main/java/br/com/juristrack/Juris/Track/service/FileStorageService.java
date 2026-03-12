@@ -1,6 +1,7 @@
 package br.com.juristrack.Juris.Track.service;
 
 import br.com.juristrack.Juris.Track.config.FileStorageConfig;
+import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.exception.FileStorageException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -16,23 +17,20 @@ import java.util.UUID;
 public class FileStorageService {
 
     private final Path fileStorageLocation;
-    private final String folderPath;
 
     public FileStorageService(FileStorageConfig fileStorageConfig) {
         this.fileStorageLocation = Paths.get(fileStorageConfig.getStoragePath())
                 .toAbsolutePath()
                 .normalize();
-
-        this.folderPath = fileStorageConfig.getPhotoFolder();
     }
 
-    public String save(MultipartFile filePhoto) {
+    public String save(MultipartFile filePhoto, FileType fileType) {
         if (filePhoto.isEmpty()) {
             return null;
         }
 
         String fileName = StringUtils.cleanPath(filePhoto.getOriginalFilename());
-        String relativePath = folderPath + UUID.randomUUID() + "-" + fileName;
+        String relativePath = fileType.getFolder() + UUID.randomUUID() + "-" + fileName;
 
         try {
             Path targetLocation = fileStorageLocation.resolve(relativePath).normalize();
@@ -49,7 +47,7 @@ public class FileStorageService {
         }
     }
 
-    public String update(MultipartFile filePhoto, String relativePath) {
+    public String update(MultipartFile filePhoto, FileType fileType, String relativePath) {
         if (filePhoto == null || filePhoto.isEmpty()) {
             return null;
         }
@@ -58,7 +56,7 @@ public class FileStorageService {
             delete(relativePath);
         }
 
-        return save(filePhoto);
+        return save(filePhoto, fileType);
     }
 
     public void delete(String relativePath) {

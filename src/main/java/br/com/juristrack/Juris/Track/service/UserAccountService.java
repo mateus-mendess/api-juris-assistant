@@ -36,6 +36,7 @@ public class UserAccountService {
         UserAccount userAccount = userAccountMapper.toUserAccount(userAccountRequest, authProvider);
 
         userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
+
         userAccount.getRoles().add(role);
 
         return userAccount;

@@ -40,6 +40,7 @@ public class UserAccount {
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

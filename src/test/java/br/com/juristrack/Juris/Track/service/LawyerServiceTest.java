@@ -4,6 +4,7 @@ import br.com.juristrack.Juris.Track.dto.request.LawyerRequest;
 import br.com.juristrack.Juris.Track.dto.request.LawyerUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.LawyerResponse;
 import br.com.juristrack.Juris.Track.enums.AuthProvider;
+import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
@@ -127,23 +128,20 @@ class LawyerServiceTest {
             UserAccount userAccount = UserAccountSupport.validEntity();
             Lawyer lawyer = LawyerSupport.validEntity();
             LawyerResponse lawyerResponse = LawyerSupport.validResponse(lawyer);
-            MultipartFile photo = mock(MultipartFile.class);
-            String photoString = "folder/nomeArquivo.type";
 
             when(lawyerRepository.existsByPhone(lawyerRequest.phone())).thenReturn(false);
             when(lawyerRepository.existsByOabNumberAndOabState(lawyerRequest.oabNumber(), lawyerRequest.oabState())).thenReturn(false);
             when(lawyerRepository.existsByCpf(lawyerRequest.cpf())).thenReturn(false);
             when(userAccountService.create(eq(lawyerRequest.userAccountRequest()), any(AuthProvider.class), any(RolesType.class))).thenReturn(userAccount);
-            when(fileStorageService.save(photo)).thenReturn(photoString);
-            when(lawyerMapper.toLawyer(eq(lawyerRequest), any(String.class))).thenReturn(lawyer);
+            when(lawyerMapper.toLawyer(lawyerRequest)).thenReturn(lawyer);
             when(lawyerRepository.save(any(Lawyer.class))).thenReturn(lawyer);
             when(lawyerMapper.toLawyerResponse(lawyer)).thenReturn(lawyerResponse);
 
             //Act & Assert
-            var response = assertDoesNotThrow(() -> lawyerService.create(lawyerRequest, photo));
+            var response = assertDoesNotThrow(() -> lawyerService.create(lawyerRequest));
 
             verify(userAccountService).create(lawyerRequest.userAccountRequest(), AuthProvider.LOCAL, RolesType.ROLE_LAWYER);
-            verify(lawyerMapper).toLawyer(lawyerRequest, photoString);
+            verify(lawyerMapper).toLawyer(lawyerRequest);
             verify(lawyerRepository).save(lawyerArgumentCaptor.capture());
 
             var captered = lawyerArgumentCaptor.getValue();
@@ -157,13 +155,12 @@ class LawyerServiceTest {
         void should_throw_CpfAlreadyExistsException_when_cpf_exists_in_db() {
             //Arrange
             LawyerRequest lawyerRequest = LawyerSupport.validRequest();
-            MultipartFile photo = mock(MultipartFile.class);
 
             when(lawyerRepository.existsByCpf(lawyerRequest.cpf())).thenReturn(true);
 
             //Act & Assert
             assertThrows(CpfAlreadyExistsException.class, ()->
-                    lawyerService.create(lawyerRequest, photo));
+                    lawyerService.create(lawyerRequest));
 
             verify(lawyerRepository, times(0)).save(any(Lawyer.class));
         }
@@ -172,13 +169,12 @@ class LawyerServiceTest {
         void should_throw_OabAlreadyExistsException_when_cpf_exists_in_db() {
             //Arrange
             LawyerRequest lawyerRequest = LawyerSupport.validRequest();
-            MultipartFile photo = mock(MultipartFile.class);
 
             when(lawyerRepository.existsByOabNumberAndOabState(lawyerRequest.oabNumber(), lawyerRequest.oabState())).thenReturn(true);
 
             //Act & Assert
             assertThrows(OabAlreadyExistsException.class, ()->
-                    lawyerService.create(lawyerRequest, photo));
+                    lawyerService.create(lawyerRequest));
 
             verify(lawyerRepository, times(0)).save(any(Lawyer.class));
         }
@@ -187,15 +183,38 @@ class LawyerServiceTest {
         void should_throw_PhoneAlreadyExistsException_when_cpf_exists_in_db() {
             //Arrange
             LawyerRequest lawyerRequest = LawyerSupport.validRequest();
-            MultipartFile photo = mock(MultipartFile.class);
 
             when(lawyerRepository.existsByPhone(lawyerRequest.phone())).thenReturn(true);
 
             //Act e Assert
             assertThrows(PhoneAlreadyExistsException.class, ()->
-                    lawyerService.create(lawyerRequest, photo));
+                    lawyerService.create(lawyerRequest));
 
             verify(lawyerRepository, times(0)).save(any(Lawyer.class));
+        }
+    }
+
+    @Nested
+    class UploadAvatarLawyer {
+        @Test
+        void should_upload_photo_with_success_when_exists() {
+            //Arrange
+            MultipartFile photo = mock(MultipartFile.class);
+            Lawyer lawyer = LawyerSupport.validEntity();
+            UUID id = lawyer.getId();
+
+            when(lawyerRepository.findById(id)).thenReturn(Optional.of(lawyer));
+            when(fileStorageService.save(photo, FileType.AVATAR)).thenReturn("/folder/file");
+            when(lawyerRepository.save(lawyer)).thenReturn(lawyer);
+
+            //Act & Assert
+            assertDoesNotThrow(() -> lawyerService.uploadPhoto(id, photo));
+
+            verify(lawyerRepository).save(lawyerArgumentCaptor.capture());
+
+            var captured = lawyerArgumentCaptor.getValue();
+
+            assertNotNull(captured.getProfilePhotoPath());
         }
     }
 
@@ -205,23 +224,20 @@ class LawyerServiceTest {
         void should_update_data_lawyer_with_success() {
             //Arrange
             LawyerUpdateRequest lawyerUpdateRequest =  LawyerSupport.validUpdateRequest();
-            MultipartFile photo = mock(MultipartFile.class);
+
             Lawyer lawyer = LawyerSupport.validEntity();
             Jwt jwt = mock(Jwt.class);
             UUID id = lawyer.getId();
-            String photoString = "folder/novo.type";
 
             when(jwt.getSubject()).thenReturn(id.toString());
             when(lawyerRepository.findById(id)).thenReturn(Optional.of(lawyer));
             when(lawyerRepository.existsByPhone(lawyerUpdateRequest.phone())).thenReturn(false);
-            when(fileStorageService.update(photo, lawyer.getProfilePhotoPath())).thenReturn(photoString);
-            doNothing().when(lawyerMapper).toUpdateLawyer(lawyerUpdateRequest, photoString, lawyer);
+            doNothing().when(lawyerMapper).toUpdateLawyer(lawyerUpdateRequest, lawyer);
 
             //Act & Assert
-            assertDoesNotThrow(() -> lawyerService.update(lawyerUpdateRequest, photo, jwt));
+            assertDoesNotThrow(() -> lawyerService.update(lawyerUpdateRequest, jwt));
 
-            verify(fileStorageService).update(photo, lawyer.getProfilePhotoPath());
-            verify(lawyerMapper).toUpdateLawyer(eq(lawyerUpdateRequest), eq(photoString), lawyerArgumentCaptor.capture());
+            verify(lawyerMapper).toUpdateLawyer(eq(lawyerUpdateRequest), lawyerArgumentCaptor.capture());
 
             var captured = lawyerArgumentCaptor.getValue();
 
@@ -232,7 +248,6 @@ class LawyerServiceTest {
         void should_throw_NotFoundException_when_lawyer_not_exists_in_db() {
             //Arrange
             LawyerUpdateRequest lawyerUpdateRequest =  LawyerSupport.validUpdateRequest();
-            MultipartFile photo = mock(MultipartFile.class);
             Jwt jwt = mock(Jwt.class);
             UUID id = UUID.randomUUID();
 
@@ -241,9 +256,9 @@ class LawyerServiceTest {
 
             //Act & Assert
             var exception = assertThrows(NotFoundException.class, () ->
-                    lawyerService.update(lawyerUpdateRequest, photo, jwt));
+                    lawyerService.update(lawyerUpdateRequest, jwt));
 
-            verify(lawyerMapper, times(0)).toUpdateLawyer(any(LawyerUpdateRequest.class), any(String.class), any(Lawyer.class));
+            verify(lawyerMapper, times(0)).toUpdateLawyer(any(LawyerUpdateRequest.class), any(Lawyer.class));
             assertEquals("User not found", exception.getMessage());
         }
 
@@ -251,7 +266,6 @@ class LawyerServiceTest {
         void should_throw_PhoneAlreadyExistsException_when_phone_exists_in_db() {
             //Arrange
             LawyerUpdateRequest lawyerUpdateRequest =  LawyerSupport.validUpdateRequest();
-            MultipartFile photo = mock(MultipartFile.class);
             Jwt jwt = mock(Jwt.class);
             UUID id = UUID.randomUUID();
             Lawyer lawyer = LawyerSupport.validEntity();
@@ -262,9 +276,9 @@ class LawyerServiceTest {
 
             //Act & Assert
             var exception = assertThrows(PhoneAlreadyExistsException.class, () ->
-                    lawyerService.update(lawyerUpdateRequest, photo, jwt));
+                    lawyerService.update(lawyerUpdateRequest, jwt));
 
-            verify(lawyerMapper, times(0)).toUpdateLawyer(any(LawyerUpdateRequest.class), any(String.class), any(Lawyer.class));
+            verify(lawyerMapper, times(0)).toUpdateLawyer(any(LawyerUpdateRequest.class), any(Lawyer.class));
             assertEquals("Phone already registered: " + lawyerUpdateRequest.phone(), exception.getMessage());
         }
     }

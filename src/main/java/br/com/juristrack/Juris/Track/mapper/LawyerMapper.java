@@ -10,10 +10,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface LawyerMapper {
-    Lawyer toLawyer(LawyerRequest lawyerRequest, String profilePhotoPath);
+    Lawyer toLawyer(LawyerRequest lawyerRequest);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void toUpdateLawyer(LawyerUpdateRequest lawyerUpdateRequest, String profilePhotoPath, @MappingTarget Lawyer lawyer);
+    void toUpdateLawyer(LawyerUpdateRequest lawyerUpdateRequest, @MappingTarget Lawyer lawyer);
 
     @Mapping(target = "createdAt", source = "userAccount.createdAt")
     @Mapping(target = "email", source = "userAccount.email")
