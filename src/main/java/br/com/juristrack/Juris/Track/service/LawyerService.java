@@ -3,7 +3,7 @@ package br.com.juristrack.Juris.Track.service;
 import br.com.juristrack.Juris.Track.dto.request.LawyerRequest;
 import br.com.juristrack.Juris.Track.dto.request.LawyerUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.LawyerResponse;
-import br.com.juristrack.Juris.Track.enums.AuthProvider;
+import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
@@ -47,7 +47,7 @@ public class LawyerService {
     public LawyerResponse create(LawyerRequest lawyerRequest) {
         validateRegistrationData(lawyerRequest);
 
-        UserAccount userAccount = userAccountService.create(lawyerRequest.userAccountRequest(), AuthProvider.LOCAL, RolesType.ROLE_LAWYER);
+        UserAccount userAccount = userAccountService.create(lawyerRequest.userAccountRequest(), AuthProviderType.LOCAL, RolesType.ROLE_LAWYER);
 
         Lawyer lawyer = lawyerMapper.toLawyer(lawyerRequest);
         lawyer.linkUserAccount(userAccount);

@@ -1,7 +1,7 @@
 package br.com.juristrack.Juris.Track.service;
 
 import br.com.juristrack.Juris.Track.dto.request.UserAccountRequest;
-import br.com.juristrack.Juris.Track.enums.AuthProvider;
+import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.EmailAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.util.Optional;
 
@@ -54,13 +53,13 @@ class UserAccountServiceTest {
 
             when(userAccountRepository.existsByEmail(request.email())).thenReturn(false);
             when(roleRepository.findByName(RolesType.ROLE_LAWYER.name())).thenReturn(Optional.of(role));
-            when(userAccountMapper.toUserAccount(request, AuthProvider.LOCAL)).thenReturn(entity);
+            when(userAccountMapper.toUserAccount(request, AuthProviderType.LOCAL)).thenReturn(entity);
             when(passwordEncoder.encode(request.password())).thenReturn("encodePassword");
 
             //Act & Assert
-            var userAccount = assertDoesNotThrow(() -> userAccountService.create(request, AuthProvider.LOCAL, RolesType.ROLE_LAWYER));
+            var userAccount = assertDoesNotThrow(() -> userAccountService.create(request, AuthProviderType.LOCAL, RolesType.ROLE_LAWYER));
 
-            verify(userAccountMapper).toUserAccount(request, AuthProvider.LOCAL);
+            verify(userAccountMapper).toUserAccount(request, AuthProviderType.LOCAL);
 
             assertEquals(request.email(), userAccount.getEmail());
             assertNotNull(userAccount.getRoles());
@@ -75,10 +74,10 @@ class UserAccountServiceTest {
 
             //Act e Assert
             assertThrows(EmailAlreadyExistsException.class,
-                    () -> userAccountService.create(request, AuthProvider.LOCAL, RolesType.ROLE_LAWYER));
+                    () -> userAccountService.create(request, AuthProviderType.LOCAL, RolesType.ROLE_LAWYER));
 
             verify(roleRepository, times(0)).findByName(RolesType.ROLE_LAWYER.name());
-            verify(userAccountMapper, times(0)).toUserAccount(request, AuthProvider.LOCAL);
+            verify(userAccountMapper, times(0)).toUserAccount(request, AuthProviderType.LOCAL);
         }
 
         @Test
@@ -91,9 +90,9 @@ class UserAccountServiceTest {
 
             //Act e Assert
             var exception = assertThrows(NotFoundException.class,
-                    () -> userAccountService.create(request, AuthProvider.LOCAL, rolesType));
+                    () -> userAccountService.create(request, AuthProviderType.LOCAL, rolesType));
 
-            verify(userAccountMapper, times(0)).toUserAccount(any(UserAccountRequest.class), any(AuthProvider.class));
+            verify(userAccountMapper, times(0)).toUserAccount(any(UserAccountRequest.class), any(AuthProviderType.class));
 
             assertEquals("role not found.", exception.getMessage());
         }

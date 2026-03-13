@@ -1,7 +1,7 @@
 package br.com.juristrack.Juris.Track.support;
 
 import br.com.juristrack.Juris.Track.dto.request.UserAccountRequest;
-import br.com.juristrack.Juris.Track.enums.AuthProvider;
+import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.model.entity.Lawyer;
 import br.com.juristrack.Juris.Track.model.entity.Role;
 import br.com.juristrack.Juris.Track.model.entity.UserAccount;
@@ -26,7 +26,7 @@ public class UserAccountSupport {
                 lawyer,
                 "teste@gmail.com",
                 "Teste123@",
-                AuthProvider.LOCAL,
+                AuthProviderType.LOCAL,
                 true,
                 Instant.now(),
                 new HashSet<>(Set.of(role)));

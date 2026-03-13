@@ -3,7 +3,7 @@ package br.com.juristrack.Juris.Track.service;
 import br.com.juristrack.Juris.Track.dto.request.LawyerRequest;
 import br.com.juristrack.Juris.Track.dto.request.LawyerUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.LawyerResponse;
-import br.com.juristrack.Juris.Track.enums.AuthProvider;
+import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
@@ -132,7 +132,7 @@ class LawyerServiceTest {
             when(lawyerRepository.existsByPhone(lawyerRequest.phone())).thenReturn(false);
             when(lawyerRepository.existsByOabNumberAndOabState(lawyerRequest.oabNumber(), lawyerRequest.oabState())).thenReturn(false);
             when(lawyerRepository.existsByCpf(lawyerRequest.cpf())).thenReturn(false);
-            when(userAccountService.create(eq(lawyerRequest.userAccountRequest()), any(AuthProvider.class), any(RolesType.class))).thenReturn(userAccount);
+            when(userAccountService.create(eq(lawyerRequest.userAccountRequest()), any(AuthProviderType.class), any(RolesType.class))).thenReturn(userAccount);
             when(lawyerMapper.toLawyer(lawyerRequest)).thenReturn(lawyer);
             when(lawyerRepository.save(any(Lawyer.class))).thenReturn(lawyer);
             when(lawyerMapper.toLawyerResponse(lawyer)).thenReturn(lawyerResponse);
@@ -140,7 +140,7 @@ class LawyerServiceTest {
             //Act & Assert
             var response = assertDoesNotThrow(() -> lawyerService.create(lawyerRequest));
 
-            verify(userAccountService).create(lawyerRequest.userAccountRequest(), AuthProvider.LOCAL, RolesType.ROLE_LAWYER);
+            verify(userAccountService).create(lawyerRequest.userAccountRequest(), AuthProviderType.LOCAL, RolesType.ROLE_LAWYER);
             verify(lawyerMapper).toLawyer(lawyerRequest);
             verify(lawyerRepository).save(lawyerArgumentCaptor.capture());
 

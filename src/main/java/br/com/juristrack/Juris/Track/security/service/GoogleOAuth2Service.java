@@ -1,6 +1,6 @@
 package br.com.juristrack.Juris.Track.security.service;
 
-import br.com.juristrack.Juris.Track.enums.AuthProvider;
+import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
 import br.com.juristrack.Juris.Track.model.entity.Role;
@@ -48,7 +48,7 @@ public class GoogleOAuth2Service implements OAuth2UserService<OidcUserRequest, O
         return userAccountRepository.save(
                 UserAccount.builder()
                         .email(oidcUser.getEmail())
-                        .authProvider(AuthProvider.GOOGLE)
+                        .authProviderType(AuthProviderType.GOOGLE)
                         .roles(Set.of(role))
                         .build()
         );

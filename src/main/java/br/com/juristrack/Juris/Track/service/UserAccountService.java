@@ -1,7 +1,7 @@
 package br.com.juristrack.Juris.Track.service;
 
 import br.com.juristrack.Juris.Track.dto.request.UserAccountRequest;
-import br.com.juristrack.Juris.Track.enums.AuthProvider;
+import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.EmailAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
@@ -15,8 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
-
 @RequiredArgsConstructor
 @Service
 public class UserAccountService {
@@ -27,13 +25,13 @@ public class UserAccountService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserAccount create(UserAccountRequest userAccountRequest, AuthProvider authProvider, RolesType rolesType) {
+    public UserAccount create(UserAccountRequest userAccountRequest, AuthProviderType authProviderType, RolesType rolesType) {
         validateRegistrationData(userAccountRequest);
 
         Role role = roleRepository.findByName(rolesType.name())
                 .orElseThrow(() -> new NotFoundException("role not found."));
 
-        UserAccount userAccount = userAccountMapper.toUserAccount(userAccountRequest, authProvider);
+        UserAccount userAccount = userAccountMapper.toUserAccount(userAccountRequest, authProviderType);
 
         userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
 
