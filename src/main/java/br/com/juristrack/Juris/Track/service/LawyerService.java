@@ -36,7 +36,14 @@ public class LawyerService {
         return lawyerMapper.toLawyersResponse(lawyerRepository.findAll());
     }
 
-    public LawyerResponse findById(Jwt jwt) {
+    public Lawyer getAuthenticatedLawyer(Jwt jwt) {
+        UUID id = UUID.fromString(jwt.getSubject());
+
+        return lawyerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Attorney not found."));
+    }
+
+    public LawyerResponse findByLawyer(Jwt jwt) {
         UUID id = UUID.fromString(jwt.getSubject());
 
         return lawyerMapper.toLawyerResponse(lawyerRepository.findById(id)

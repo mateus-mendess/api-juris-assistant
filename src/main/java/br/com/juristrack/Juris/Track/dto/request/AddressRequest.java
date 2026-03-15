@@ -16,5 +16,8 @@ public record AddressRequest(
         String city,
 
         @NotBlank
-        String state
+        String state,
+
+        @NotBlank
+        String zipCode
 ) {}

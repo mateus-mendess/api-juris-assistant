@@ -20,6 +20,8 @@ public class DeclarationTerm {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private String name;
+
     private String filePath;
 
     private Instant createdAt = Instant.now();
@@ -27,5 +29,10 @@ public class DeclarationTerm {
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
+
+    public void linkClient(Client client) {
+        this.setClient(client);
+        client.getDeclarationTerms().add(this);
+    }
 
 }

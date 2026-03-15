@@ -20,6 +20,8 @@ public class Contract {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private String name;
+
     private String filePath;
 
     private Instant createdAt = Instant.now();
@@ -27,4 +29,9 @@ public class Contract {
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
+
+    public void linkClient(Client client) {
+        this.setClient(client);
+        client.getContracts().add(this);
+    }
 }

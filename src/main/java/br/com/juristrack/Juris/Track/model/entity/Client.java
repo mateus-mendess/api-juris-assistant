@@ -33,8 +33,6 @@ public class Client {
 
     private String work;
 
-    private String phoneCode;
-
     private String phone;
 
     private Boolean status = true;
@@ -56,6 +54,8 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Contract> contracts = new HashSet<>();
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private  Set<ClientDocument> clientDocuments = new HashSet<>();
+    public void linkAddressAndAttorney(Address address, Lawyer lawyer) {
+        this.address = address;
+        this.lawyer = lawyer;
+    }
 }

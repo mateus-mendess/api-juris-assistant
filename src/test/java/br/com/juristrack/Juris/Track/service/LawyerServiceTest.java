@@ -95,7 +95,7 @@ class LawyerServiceTest {
             when(lawyerRepository.findById(id)).thenReturn(Optional.of(lawyer));
 
             //Act & Assert
-           var response = assertDoesNotThrow(() -> lawyerService.findById(jwt));
+           var response = assertDoesNotThrow(() -> lawyerService.findByLawyer(jwt));
 
             assertEquals(lawyer.getId(), response.id());
         }
@@ -112,7 +112,7 @@ class LawyerServiceTest {
 
             //Act & Assert
             var exception = assertThrows(NotFoundException.class, () ->
-                    lawyerService.findById(jwt));
+                    lawyerService.findByLawyer(jwt));
 
             assertEquals("User not found.", exception.getMessage());
         }

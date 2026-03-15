@@ -31,7 +31,7 @@ public class LawyerController {
 
     @GetMapping
     public ResponseEntity<LawyerResponse> findById(Jwt jwt) {
-        return ResponseEntity.ok().body(lawyerService.findById(jwt));
+        return ResponseEntity.ok().body(lawyerService.findByLawyer(jwt));
     }
 
     @PostMapping
@@ -53,7 +53,6 @@ public class LawyerController {
 
     @PatchMapping
     public ResponseEntity<Void> update(@RequestPart(value = "lawyer update request", required = false) @Valid LawyerUpdateRequest lawyerUpdateRequest,
-                                 @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto,
                                  @AuthenticationPrincipal Jwt jwt) {
 
         lawyerService.update(lawyerUpdateRequest, jwt);

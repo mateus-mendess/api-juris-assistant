@@ -24,26 +24,26 @@ public class FileStorageService {
                 .normalize();
     }
 
-    public String save(MultipartFile filePhoto, FileType fileType) {
-        if (filePhoto.isEmpty()) {
+    public String save(MultipartFile file, FileType fileType) {
+        if (file.isEmpty()) {
             return null;
         }
 
-        String fileName = StringUtils.cleanPath(filePhoto.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         String relativePath = fileType.getFolder() + UUID.randomUUID() + "-" + fileName;
 
         try {
             Path targetLocation = fileStorageLocation.resolve(relativePath).normalize();
 
             if (!targetLocation.startsWith(fileStorageLocation)) {
-                throw new FileStorageException("invalid filePhoto.");
+                throw new FileStorageException("invalid file.");
             }
 
-            filePhoto.transferTo(targetLocation);
+            file.transferTo(targetLocation);
 
             return relativePath;
         } catch (IOException exception) {
-            throw new FileStorageException("Failed to save filePhoto: " + exception);
+            throw new FileStorageException("Failed to save file: " + exception);
         }
     }
 

@@ -21,6 +21,8 @@ public class PowerOfAttorney {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private String name;
+
     private String filePath;
 
     @Enumerated(value = EnumType.STRING)
@@ -31,4 +33,9 @@ public class PowerOfAttorney {
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
+
+    public void linkClient(Client client) {
+        this.setClient(client);
+        client.getPowerOfAttorneys().add(this);
+    }
 }
