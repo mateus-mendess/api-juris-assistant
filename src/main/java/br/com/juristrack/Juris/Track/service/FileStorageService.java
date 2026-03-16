@@ -43,7 +43,7 @@ public class FileStorageService {
 
             return relativePath;
         } catch (IOException exception) {
-            throw new FileStorageException("Failed to save file: " + exception);
+            throw new FileStorageException("Failed to buildAddress file: " + exception);
         }
     }
 

@@ -36,7 +36,7 @@ public class ClientService {
         validateRegistrationData(request.cpf(), request.phone());
 
         Lawyer lawyer = lawyerService.getAuthenticatedLawyer(jwt);
-        Address address = addressService.save(request.addressRequest());
+        Address address = addressService.buildAddress(request.addressRequest());
 
         Client client = clientMapper.toClient(request);
 

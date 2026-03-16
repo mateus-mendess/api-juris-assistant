@@ -41,8 +41,8 @@ public class Client {
     @JoinColumn(name = "lawyer_id")
     private Lawyer lawyer;
 
-    @OneToOne
-    @JoinColumn(name = "address_id", unique = true)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
     private Address address;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)

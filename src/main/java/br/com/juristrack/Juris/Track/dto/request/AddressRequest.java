@@ -7,7 +7,7 @@ public record AddressRequest(
         String street,
 
         @NotBlank
-        Integer number,
+        String number,
 
         @NotBlank
         String neighborhood,

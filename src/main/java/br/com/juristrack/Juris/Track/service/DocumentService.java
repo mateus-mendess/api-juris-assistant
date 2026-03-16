@@ -49,7 +49,7 @@ public class DocumentService {
     public void uploadDeclarationTerm(UUID id, String nameFile, MultipartFile file) {
         Client client = clientService.findById(id);
 
-        String relativePath = fileStorageService.save(file, FileType.POWER_OF_ATTORNEY);
+        String relativePath = fileStorageService.save(file, FileType.DECLARATION_TERM);
 
         DeclarationTerm declarationTerm = documentMapper.toDeclarationTerm(nameFile, relativePath);
 
@@ -62,7 +62,7 @@ public class DocumentService {
     public void uploadContract(UUID id, String nameFile, MultipartFile file) {
         Client client = clientService.findById(id);
 
-        String relativePath = fileStorageService.save(file, FileType.POWER_OF_ATTORNEY);
+        String relativePath = fileStorageService.save(file, FileType.CONTRACT);
 
         Contract contract = documentMapper.toContract(nameFile, relativePath);
 

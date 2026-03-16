@@ -1,6 +1,5 @@
 package br.com.juristrack.Juris.Track.model.entity;
 
-import br.com.juristrack.Juris.Track.enums.PowerOfAttorneyType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,9 +23,6 @@ public class PowerOfAttorney {
     private String name;
 
     private String filePath;
-
-    @Enumerated(value = EnumType.STRING)
-    private PowerOfAttorneyType type;
 
     private Instant createdAt = Instant.now();
 

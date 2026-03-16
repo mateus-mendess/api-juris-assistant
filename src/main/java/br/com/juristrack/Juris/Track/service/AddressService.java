@@ -14,7 +14,7 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
-    public Address save(AddressRequest request) {
+    public Address buildAddress(AddressRequest request) {
         return addressMapper.toAddress(request);
     }
 }

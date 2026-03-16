@@ -4,7 +4,7 @@ public enum FileType {
     AVATAR("avatars/"),
     POWER_OF_ATTORNEY("powers-of-attorney/"),
     DECLARATION_TERM("declaration-terms/"),
-    DOCUMENT("documents/");
+    CONTRACT("contract/");
 
     private final String folder;
 
