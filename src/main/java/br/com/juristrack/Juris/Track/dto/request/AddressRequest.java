@@ -12,6 +12,8 @@ public record AddressRequest(
         @NotBlank
         String neighborhood,
 
+        String complement,
+
         @NotBlank
         String city,
 

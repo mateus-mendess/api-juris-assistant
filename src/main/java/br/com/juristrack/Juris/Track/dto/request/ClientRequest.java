@@ -20,7 +20,6 @@ public record ClientRequest(
         String nationality,
 
         @NotNull
-        @Pattern(regexp = "^(SINGLE|MARRIED|DIVORCED|WIDOWED)$", message = "Invalid marital status")
         MaritalStatusType maritalStatus,
 
         @NotBlank

@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "")
+@Table(name = "client")
 @Entity
 public class Client {
     @Id
@@ -29,33 +29,28 @@ public class Client {
     private String nationality;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "marital_status")
     private MaritalStatusType maritalStatus;
 
     private String work;
 
     private String phone;
 
-    private Boolean status = true;
+    private Boolean active = true;
 
     @ManyToOne
-    @JoinColumn(name = "lawyer_id")
+    @JoinColumn(name = "attorney_id")
     private Lawyer lawyer;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PowerOfAttorney> powerOfAttorneys = new HashSet<>();
-
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<DeclarationTerm> declarationTerms = new HashSet<>();
-
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Contract> contracts = new HashSet<>();
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private Set<Document> documents = new HashSet<>();
 
     public void linkAddressAndAttorney(Address address, Lawyer lawyer) {
-        this.address = address;
-        this.lawyer = lawyer;
+        this.setAddress(address);
+        this.setLawyer(lawyer);
     }
 }

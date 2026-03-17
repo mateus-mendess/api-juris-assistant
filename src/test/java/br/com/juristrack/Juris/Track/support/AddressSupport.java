@@ -8,7 +8,7 @@ import java.util.UUID;
 public class AddressSupport {
 
     public static AddressRequest validRequest() {
-        return new AddressRequest("rua X", "20", "Bairro Santo", "Unidos", "AL", "57800-000");
+        return new AddressRequest("rua X", "20", "Bairro Santo","",  "Unidos", "AL", "57800-000");
     }
 
     public static Address validEntity() {
@@ -16,6 +16,7 @@ public class AddressSupport {
                 validRequest().street(),
                 validRequest().number(),
                 validRequest().neighborhood(),
+                validRequest().complement(),
                 validRequest().city(),
                 validRequest().state(),
                 validRequest().zipCode());

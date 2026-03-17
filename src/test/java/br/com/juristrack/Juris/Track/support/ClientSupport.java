@@ -4,12 +4,9 @@ import br.com.juristrack.Juris.Track.dto.request.ClientRequest;
 import br.com.juristrack.Juris.Track.dto.response.ClientResponse;
 import br.com.juristrack.Juris.Track.enums.MaritalStatusType;
 import br.com.juristrack.Juris.Track.model.entity.Client;
-import br.com.juristrack.Juris.Track.model.entity.Contract;
-import br.com.juristrack.Juris.Track.model.entity.DeclarationTerm;
-import br.com.juristrack.Juris.Track.model.entity.PowerOfAttorney;
+import br.com.juristrack.Juris.Track.model.entity.Document;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class ClientSupport {
@@ -31,18 +28,12 @@ public class ClientSupport {
                 true,
                 LawyerSupport.validEntity(),
                 AddressSupport.validEntity(),
-                new HashSet<>(),
-                new HashSet<>(),
                 new HashSet<>()
         );
 
-        PowerOfAttorney poa = PowerOfAttorneySupport.validEntity(client);
-        DeclarationTerm dt = DeclarationTermSupport.validEntity(client);
-        Contract contract = ContractSupport.validEntity(client);
+        Document documents = DocumentsSupport.validEntity(client);
 
-        client.getPowerOfAttorneys().add(poa);
-        client.getDeclarationTerms().add(dt);
-        client.getContracts().add(contract);
+        client.getDocuments().add(documents);
 
         return client;
     }
