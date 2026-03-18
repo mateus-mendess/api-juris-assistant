@@ -60,11 +60,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/lawyers").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/attorney").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/lawyers/{id}/photo").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/documents/upload-chunk").permitAll()
-                        .requestMatchers(HttpMethod.POST, "api/documents/merge-chunks").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(auth -> auth.jwt(Customizer.withDefaults()))

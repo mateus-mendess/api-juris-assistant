@@ -1,7 +1,6 @@
 package br.com.juristrack.Juris.Track.security.user;
 
-import br.com.juristrack.Juris.Track.model.entity.UserAccount;
-import lombok.Getter;
+import br.com.juristrack.Juris.Track.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,7 +13,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserAuthentication implements UserDetails {
 
-    private final UserAccount userAccount;
+    private final User userAccount;
 
     public UUID getId() {
         return userAccount.getId();
@@ -55,6 +54,6 @@ public class UserAuthentication implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return userAccount.getIsEnable();
+        return userAccount.getActive();
     }
 }

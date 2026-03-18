@@ -40,7 +40,7 @@ public class Client {
 
     @ManyToOne
     @JoinColumn(name = "attorney_id")
-    private Lawyer lawyer;
+    private Attorney attorney;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
@@ -49,8 +49,9 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private Set<Document> documents = new HashSet<>();
 
-    public void linkAddressAndAttorney(Address address, Lawyer lawyer) {
+    public void linkAddressAndAttorney(Address address, Attorney attorney) {
         this.setAddress(address);
-        this.setLawyer(lawyer);
+        this.setAttorney(attorney);
+        attorney.getClients().add(this);
     }
 }

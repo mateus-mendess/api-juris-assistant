@@ -46,38 +46,6 @@ public class UploadService {
         documentsRepository.save(documents);
     }
 
-    public void uploadChunk(String fileName, MultipartFile chunk, Integer chunkIndex) throws IOException {
-        Path dir = Paths.get(TEMP_DIR, fileName);
-
-        if (!Files.exists(dir)) {
-            Files.createDirectories(dir);
-        }
-
-        Path chunkFile = dir.resolve("chunk_" + chunkIndex);
-
-        try(OutputStream os = Files.newOutputStream(chunkFile)) {
-            os.write(chunk.getBytes());
-        }
-    }
-
-    public void mergeChunk(String fileName) throws IOException {
-        File dir = new File(TEMP_DIR + fileName);
-        File mergedFile = new File("test-chunk/" + fileName);
-
-        mergedFile.getParentFile().mkdirs();
-
-        try (OutputStream os = new FileOutputStream(mergedFile)) {
-
-            for (int i = 0; i < dir.listFiles().length; i++) {
-                File chunkFile = new File(dir, "chunk_" + i);
-                Files.copy(chunkFile.toPath(), os);
-                chunkFile.delete();
-            }
-
-        }
-        dir.delete();
-    }
-
     private void validate(MultipartFile file, FileType type) {
         if (type == FileType.POWER_OF_ATTORNEY && file.isEmpty()) {
             throw new FileRequiredException("Required file for registration.");

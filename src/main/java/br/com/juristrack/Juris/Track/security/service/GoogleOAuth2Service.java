@@ -4,9 +4,9 @@ import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
 import br.com.juristrack.Juris.Track.model.entity.Role;
-import br.com.juristrack.Juris.Track.model.entity.UserAccount;
+import br.com.juristrack.Juris.Track.model.entity.User;
 import br.com.juristrack.Juris.Track.model.repository.RoleRepository;
-import br.com.juristrack.Juris.Track.model.repository.UserAccountRepository;
+import br.com.juristrack.Juris.Track.model.repository.UserRepository;
 import br.com.juristrack.Juris.Track.security.user.UserAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -23,15 +23,15 @@ import java.util.Set;
 @Service
 public class GoogleOAuth2Service implements OAuth2UserService<OidcUserRequest, OidcUser> {
 
-    private final UserAccountRepository userAccountRepository;
+    private final UserRepository userAccountRepository;
     private final RoleRepository roleRepository;
 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         OidcUser oidcUser = new OidcUserService().loadUser(userRequest);
 
-        UserAccount user = userAccountRepository.findByEmail(oidcUser.getEmail())
-                .orElseGet(() -> createUserGoogle(oidcUser, RolesType.ROLE_LAWYER));
+        User user = userAccountRepository.findByEmail(oidcUser.getEmail())
+                .orElseGet(() -> createUserGoogle(oidcUser, RolesType.ROLE_ATTORNEY));
 
         UserAuthentication userAuthentication = new UserAuthentication(user);
 
@@ -41,12 +41,13 @@ public class GoogleOAuth2Service implements OAuth2UserService<OidcUserRequest, O
         );
     }
 
-    private UserAccount createUserGoogle(OidcUser oidcUser, RolesType rolesType) {
+    private User createUserGoogle(OidcUser oidcUser, RolesType rolesType) {
         Role role = roleRepository.findByName(rolesType.name())
                 .orElseThrow(() -> new NotFoundException("Role not found."));
 
         return userAccountRepository.save(
-                UserAccount.builder()
+                User.builder()
+                        .providerUserId(oidcUser.getSubject())
                         .email(oidcUser.getEmail())
                         .authProviderType(AuthProviderType.GOOGLE)
                         .roles(Set.of(role))

@@ -8,12 +8,13 @@ import br.com.juristrack.Juris.Track.exception.NotFoundException;
 import br.com.juristrack.Juris.Track.exception.PhoneAlreadyExistsException;
 import br.com.juristrack.Juris.Track.mapper.ClientMapper;
 import br.com.juristrack.Juris.Track.model.entity.Address;
+import br.com.juristrack.Juris.Track.model.entity.Attorney;
 import br.com.juristrack.Juris.Track.model.entity.Client;
-import br.com.juristrack.Juris.Track.model.entity.Lawyer;
+import br.com.juristrack.Juris.Track.model.entity.User;
 import br.com.juristrack.Juris.Track.model.repository.ClientRepository;
 import br.com.juristrack.Juris.Track.support.AddressSupport;
 import br.com.juristrack.Juris.Track.support.ClientSupport;
-import br.com.juristrack.Juris.Track.support.LawyerSupport;
+import br.com.juristrack.Juris.Track.support.AttorneySupport;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +43,7 @@ class ClientServiceTest {
     private AddressService addressService;
 
     @Mock
-    private LawyerService lawyerService;
+    private AttorneyService lawyerService;
 
     @Captor
     private ArgumentCaptor<Client> clientArgumentCaptor;
@@ -89,12 +90,12 @@ class ClientServiceTest {
             AddressRequest addressRequest = AddressSupport.validRequest();
             Client clientEntity = ClientSupport.validEntity();
             Address addressEntity = AddressSupport.validEntity();
-            Lawyer lawyerEntity = LawyerSupport.validEntity();
+            Attorney attorney = AttorneySupport.validEntity(new User(), addressEntity);
             ClientResponse response = ClientSupport.validResponse();
 
             when(clientRepository.existsByCpf(clientrequest.cpf())).thenReturn(false);
             when(clientRepository.existsByPhone(clientrequest.phone())).thenReturn(false);
-            when(lawyerService.getAuthenticatedLawyer(jwt)).thenReturn(lawyerEntity);
+            when(lawyerService.getAuthenticatedLawyer(jwt)).thenReturn(attorney);
             when(addressService.buildAddress(addressRequest)).thenReturn(addressEntity);
             when(clientMapper.toClient(clientrequest)).thenReturn(clientEntity);
             when(clientRepository.save(clientEntity)).thenReturn(clientEntity);

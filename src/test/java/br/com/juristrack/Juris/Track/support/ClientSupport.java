@@ -3,8 +3,10 @@ package br.com.juristrack.Juris.Track.support;
 import br.com.juristrack.Juris.Track.dto.request.ClientRequest;
 import br.com.juristrack.Juris.Track.dto.response.ClientResponse;
 import br.com.juristrack.Juris.Track.enums.MaritalStatusType;
+import br.com.juristrack.Juris.Track.model.entity.Address;
 import br.com.juristrack.Juris.Track.model.entity.Client;
 import br.com.juristrack.Juris.Track.model.entity.Document;
+import br.com.juristrack.Juris.Track.model.entity.User;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -26,7 +28,7 @@ public class ClientSupport {
                 validRequest().work(),
                 validRequest().phone(),
                 true,
-                LawyerSupport.validEntity(),
+                AttorneySupport.validEntity(new User(), new Address()),
                 AddressSupport.validEntity(),
                 new HashSet<>()
         );

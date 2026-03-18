@@ -8,7 +8,8 @@ import org.hibernate.validator.constraints.br.CPF;
 
 public record ClientRequest(
         @NotBlank
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ ]{2,100}$", message = "invalid name.")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ ]{2,100}$",
+                message = "invalid name.")
         String name,
 
         @NotBlank
@@ -16,7 +17,8 @@ public record ClientRequest(
         String cpf,
 
         @NotBlank
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ ]{2,100}$", message = "invalid nationality.")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ ]{2,100}$",
+                message = "invalid nationality.")
         String nationality,
 
         @NotNull
@@ -26,7 +28,8 @@ public record ClientRequest(
         String work,
 
         @NotBlank
-        @Pattern(regexp = "^(\\(?\\d{2}\\)?\\s?)?9?\\d{4}-?\\d{4}$", message = "invalid phone")
+        @Pattern(regexp = "^(\\(?\\d{2}\\)?\\s?)?9?\\d{4}-?\\d{4}$",
+                message = "invalid phone")
         String phone,
 
         AddressRequest addressRequest

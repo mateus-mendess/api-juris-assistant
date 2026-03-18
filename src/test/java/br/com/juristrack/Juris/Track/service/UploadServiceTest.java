@@ -54,7 +54,7 @@ class UploadServiceTest {
             when(documentsRepository.save(documents)).thenReturn(documents);
 
             //Act & Assert
-            assertDoesNotThrow(() -> uploadService.upload(client.getId(), documents.getTitle(), file, FileType.CONTRACT));
+            assertDoesNotThrow(() -> uploadService.upload(client.getId(), documents.getFileName(), file, FileType.CONTRACT));
 
             verify(fileStorageService).save(any(MultipartFile.class), any(FileType.class));
             verify(documentsRepository).save(any(Document.class));

@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface DocumentsMapper {
-    Document toDocument(String title, String storagePath, FileType type);
+    Document toDocument(String fileName, String filePath, FileType fileType);
 }

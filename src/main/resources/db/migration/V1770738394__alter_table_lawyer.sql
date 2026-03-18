@@ -1,2 +1,0 @@
-ALTER TABLE lawyer
-ADD COLUMN phone_code VARCHAR(2) NOT NULL;

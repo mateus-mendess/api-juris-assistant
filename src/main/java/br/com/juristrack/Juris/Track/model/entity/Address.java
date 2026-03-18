@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "address")
+@Table(name = "addresses")
 @Entity
 public class Address {
     @Id
@@ -23,9 +23,9 @@ public class Address {
 
     private String number;
 
-    private String neighborhood;
-
     private String complement;
+
+    private String neighborhood;
 
     private String city;
 

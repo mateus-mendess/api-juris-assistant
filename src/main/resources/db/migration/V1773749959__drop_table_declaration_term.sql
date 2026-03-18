@@ -1,1 +1,0 @@
-DROP TABLE declaration_term;

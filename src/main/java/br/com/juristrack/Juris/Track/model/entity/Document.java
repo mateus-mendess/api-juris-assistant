@@ -21,15 +21,17 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "name")
-    private String title;
+    @Column(name = "file_name")
+    private String fileName;
 
     @Column(name = "file_path")
-    private String storagePath;
+    private String filePath;
 
     @Enumerated(value = EnumType.STRING)
-    private FileType type;
+    @Column(name = "document_type")
+    private FileType fileType;
 
+    @Column(name = "created_at")
     private Instant createdAt = Instant.now();
 
     @ManyToOne

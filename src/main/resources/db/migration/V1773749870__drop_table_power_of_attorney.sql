@@ -1,1 +1,0 @@
-DROP TABLE power_of_attorney;

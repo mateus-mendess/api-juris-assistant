@@ -8,7 +8,7 @@ import br.com.juristrack.Juris.Track.exception.PhoneAlreadyExistsException;
 import br.com.juristrack.Juris.Track.mapper.ClientMapper;
 import br.com.juristrack.Juris.Track.model.entity.Address;
 import br.com.juristrack.Juris.Track.model.entity.Client;
-import br.com.juristrack.Juris.Track.model.entity.Lawyer;
+import br.com.juristrack.Juris.Track.model.entity.Attorney;
 import br.com.juristrack.Juris.Track.model.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -23,7 +23,7 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
-    private final LawyerService lawyerService;
+    private final AttorneyService attorneyService;
     private final AddressService addressService;
 
     public Client findById(UUID id) {
@@ -35,12 +35,12 @@ public class ClientService {
     public ClientResponse save(ClientRequest request, Jwt jwt) {
         validateRegistrationData(request.cpf(), request.phone());
 
-        Lawyer lawyer = lawyerService.getAuthenticatedLawyer(jwt);
+        Attorney attorney = attorneyService.getAuthenticatedLawyer(jwt);
         Address address = addressService.buildAddress(request.addressRequest());
 
         Client client = clientMapper.toClient(request);
 
-        client.linkAddressAndAttorney(address, lawyer);
+        client.linkAddressAndAttorney(address, attorney);
 
         return clientMapper.toClientResponse(clientRepository.save(client));
     }
