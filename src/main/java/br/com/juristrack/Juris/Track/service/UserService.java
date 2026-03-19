@@ -12,8 +12,11 @@ import br.com.juristrack.Juris.Track.model.repository.RoleRepository;
 import br.com.juristrack.Juris.Track.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -23,6 +26,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    public User findById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found."));
+    }
 
     @Transactional
     public User create(UserRequest userRequest, AuthProviderType authProviderType, RolesType rolesType) {

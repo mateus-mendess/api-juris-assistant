@@ -28,18 +28,13 @@ public class AttorneyController {
         return ResponseEntity.ok().body(attorneyService.findAll());
     }
 
-    @GetMapping
-    public ResponseEntity<AttorneyResponse> findById(Jwt jwt) {
-        return ResponseEntity.ok().body(attorneyService.findByLawyer(jwt));
-    }
-
     @PostMapping
     public ResponseEntity<AttorneyResponse> create(@RequestBody @Valid AttorneyRequest attorneyRequest) {
-        AttorneyResponse lawyerResponse = attorneyService.create(attorneyRequest);
+        AttorneyResponse attorneyResponse = attorneyService.create(attorneyRequest);
 
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(lawyerResponse.id()).toUri();
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(attorneyResponse.id()).toUri();
 
-        return ResponseEntity.created(uri).body(lawyerResponse);
+        return ResponseEntity.created(uri).build();
     }
 
     @PatchMapping("/photo")

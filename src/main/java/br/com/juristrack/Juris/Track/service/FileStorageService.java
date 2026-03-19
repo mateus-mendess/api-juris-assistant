@@ -47,18 +47,6 @@ public class FileStorageService {
         }
     }
 
-    public String update(MultipartFile filePhoto, FileType fileType, String relativePath) {
-        if (filePhoto == null || filePhoto.isEmpty()) {
-            return null;
-        }
-
-        if (relativePath != null && !relativePath.isBlank()) {
-            delete(relativePath);
-        }
-
-        return save(filePhoto, fileType);
-    }
-
     public void delete(String relativePath) {
         if (relativePath == null || relativePath.isBlank()) {
             return;

@@ -9,6 +9,7 @@ import br.com.juristrack.Juris.Track.mapper.ClientMapper;
 import br.com.juristrack.Juris.Track.model.entity.Address;
 import br.com.juristrack.Juris.Track.model.entity.Client;
 import br.com.juristrack.Juris.Track.model.entity.Attorney;
+import br.com.juristrack.Juris.Track.model.entity.User;
 import br.com.juristrack.Juris.Track.model.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -23,7 +24,7 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
-    private final AttorneyService attorneyService;
+    private final AuthenticationService authenticationService;
     private final AddressService addressService;
 
     public Client findById(UUID id) {
@@ -35,7 +36,9 @@ public class ClientService {
     public ClientResponse save(ClientRequest request, Jwt jwt) {
         validateRegistrationData(request.cpf(), request.phone());
 
-        Attorney attorney = attorneyService.getAuthenticatedLawyer(jwt);
+        User user = authenticationService.getAuthenticatedUser(jwt);
+        Attorney attorney = user.getAttorney();
+
         Address address = addressService.buildAddress(request.addressRequest());
 
         Client client = clientMapper.toClient(request);

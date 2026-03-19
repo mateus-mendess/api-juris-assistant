@@ -7,7 +7,6 @@ import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
-import br.com.juristrack.Juris.Track.exception.NotFoundException;
 import br.com.juristrack.Juris.Track.exception.OabAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.PhoneAlreadyExistsException;
 import br.com.juristrack.Juris.Track.mapper.AttorneyMapper;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -33,23 +31,10 @@ public class AttorneyService {
     private final UserService userService;
     private final FileStorageService fileStorageService;
     private final AddressService addressService;
+    private final AuthenticationService authenticationService;
 
     public List<AttorneyResponse> findAll() {
         return attorneyMapper.toAttorneysResponse(attorneyRepository.findAll());
-    }
-
-    public Attorney getAuthenticatedLawyer(Jwt jwt) {
-        UUID id = UUID.fromString(jwt.getSubject());
-
-        return attorneyRepository.findByUserId(id)
-                .orElseThrow(() -> new NotFoundException("Attorney not found."));
-    }
-
-    public AttorneyResponse findByLawyer(Jwt jwt) {
-        UUID id = UUID.fromString(jwt.getSubject());
-
-        return attorneyMapper.toAttorneyResponse(attorneyRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found.")));
     }
 
     @Transactional
@@ -69,16 +54,11 @@ public class AttorneyService {
 
     @Transactional
     public void uploadPhoto(Jwt jwt, MultipartFile filePhoto) {
-        UUID id = UUID.fromString(jwt.getSubject());
-
-        Attorney attorney = attorneyRepository.findByUserId(id)
-                .orElseThrow(() -> new NotFoundException("User not found."));
-
-        if (attorney.getProfilePhotoPath() != null) {
-            fileStorageService.update(filePhoto, FileType.AVATAR, attorney.getProfilePhotoPath());
-        }
+        User user = authenticationService.getAuthenticatedUser(jwt);
+        Attorney attorney = user.getAttorney();
 
         String relativePath = fileStorageService.save(filePhoto, FileType.AVATAR);
+        fileStorageService.delete(attorney.getProfilePhotoPath());
 
         attorney.setProfilePhotoPath(relativePath);
 
@@ -87,10 +67,8 @@ public class AttorneyService {
 
     @Transactional
     public void update(AttorneyUpdateRequest lawyerUpdateRequest, Jwt jwt) {
-        UUID id = UUID.fromString(jwt.getSubject());
-
-        Attorney attorney = attorneyRepository.findByUserId(id)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = authenticationService.getAuthenticatedUser(jwt);
+        Attorney attorney = user.getAttorney();
 
         if (attorneyRepository.existsByPhone(lawyerUpdateRequest.phone())) {
             throw new PhoneAlreadyExistsException(lawyerUpdateRequest.phone(), "phone");
@@ -101,10 +79,8 @@ public class AttorneyService {
 
     @Transactional
     public void delete(Jwt jwt) {
-        UUID id = UUID.fromString(jwt.getSubject());
-
-        Attorney attorney = attorneyRepository.findByUserId(id)
-                .orElseThrow(() -> new NotFoundException("User not found."));
+        User user = authenticationService.getAuthenticatedUser(jwt);
+        Attorney attorney = user.getAttorney();
 
         fileStorageService.delete(attorney.getProfilePhotoPath());
         attorneyRepository.delete(attorney);
