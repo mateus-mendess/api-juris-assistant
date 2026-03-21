@@ -53,7 +53,7 @@ public class AttorneyService {
     }
 
     @Transactional
-    public void uploadPhoto(Jwt jwt, MultipartFile filePhoto) {
+    public String uploadPhoto(Jwt jwt, MultipartFile filePhoto) {
         User user = authenticationService.getAuthenticatedUser(jwt);
         Attorney attorney = user.getAttorney();
 
@@ -63,6 +63,8 @@ public class AttorneyService {
         attorney.setProfilePhotoPath(relativePath);
 
         attorneyRepository.save(attorney);
+
+        return relativePath;
     }
 
     @Transactional

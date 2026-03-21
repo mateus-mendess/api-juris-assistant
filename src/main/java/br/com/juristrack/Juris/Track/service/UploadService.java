@@ -33,7 +33,7 @@ public class UploadService {
     private final ClientService clientService;
 
     @Transactional
-    public void upload(UUID id, String fileName, MultipartFile file, FileType type) {
+    public String upload(UUID id, String fileName, MultipartFile file, FileType type) {
         validate(file, type);
 
         Client client = clientService.findById(id);
@@ -44,6 +44,8 @@ public class UploadService {
         documents.linkClient(client);
 
         documentsRepository.save(documents);
+
+        return relativePath;
     }
 
     private void validate(MultipartFile file, FileType type) {
