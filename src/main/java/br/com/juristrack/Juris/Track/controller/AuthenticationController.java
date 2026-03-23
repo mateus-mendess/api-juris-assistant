@@ -18,20 +18,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Authentication", description = "Controller responsible for authenticating attorneys in the system.")
+@Tag(name = "Authentication", description = "Operations related to authentication and access to the system.")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @Operation(summary = "Authenticate attorney", description = "Authenticate using the email and password that were registered.")
+    @Operation(summary = "Authenticate attorney", description = "Authenticates an attorney using registered email and password, returning an access token.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Attorney successfully authenticated."),
-            @ApiResponse(responseCode = "401", description = "The authentication data is incorrect or does not exist in the system.")
+            @ApiResponse(responseCode = "200", description = "Authentication successful"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "401", description = "Invalid email or password")
     })
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authentication(@RequestBody @Valid AuthenticationRequest authenticationRequest) {
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest authenticationRequest) {
 
-        AuthenticationResponse authenticationResponse = authenticationService.authenticationLocal(authenticationRequest);
+        AuthenticationResponse authenticationResponse = authenticationService.authenticate(authenticationRequest);
 
         return ResponseEntity.ok().body(authenticationResponse);
     }

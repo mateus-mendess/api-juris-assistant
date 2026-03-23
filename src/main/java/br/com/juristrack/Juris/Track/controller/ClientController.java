@@ -6,6 +6,7 @@ import br.com.juristrack.Juris.Track.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +21,23 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/clients")
-@Tag(name = "Clients", description = "Controller responsible for carrying out actions involving the attorneys' clients.")
+@Tag(name = "Clients", description = "Operations related to client management for attorneys.")
 public class ClientController {
 
     private final ClientService clientService;
 
-    @Operation(summary = "Register clients",
+    @Operation(summary = "Register client",
             description = """
-                Register the customer in the system when the data is valid and the CPF 
-                (Brazilian tax identification number) has never been registered.
+                    Registers a new client in the system. The CPF (Brazilian individual taxpayer registry)
+                    must be unique and not previously registered.
                 """)
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "client created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid data")
+            @ApiResponse(responseCode = "400", description = "Invalid data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "409", description = "CPF already registered")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping
     public ResponseEntity<ClientResponse> create(@RequestBody @Valid ClientRequest request, @AuthenticationPrincipal Jwt jwt) {
         ClientResponse response = clientService.save(request, jwt);

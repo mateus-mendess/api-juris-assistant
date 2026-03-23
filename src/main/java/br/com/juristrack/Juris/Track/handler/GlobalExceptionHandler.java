@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException exception) {
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
-                400,
+                HttpStatus.CONFLICT.value(),
                 exception.getMessage(),
                 exception.getField(),
                 "This type of data already exists in the system:" + exception.getField()
@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException exception) {
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
-                404,
+                HttpStatus.NOT_FOUND.value(),
                 exception.getMessage(),
                 null,
                 "Information not found in the system."
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFileStorageException(FileStorageException exception) {
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
-                500,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 null,
                 exception.getMessage(),
                 "Error handling file/images in the system, please try again in a few minutes."

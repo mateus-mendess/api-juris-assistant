@@ -54,7 +54,7 @@ class UploadServiceTest {
             when(documentsRepository.save(documents)).thenReturn(documents);
 
             //Act & Assert
-            assertDoesNotThrow(() -> uploadService.upload(client.getId(), documents.getFileName(), file, FileType.CONTRACT));
+            assertDoesNotThrow(() -> uploadService.upload(client.getId(), file, FileType.CONTRACT));
 
             verify(fileStorageService).save(any(MultipartFile.class), any(FileType.class));
             verify(documentsRepository).save(any(Document.class));
@@ -70,7 +70,7 @@ class UploadServiceTest {
             when(file.isEmpty()).thenReturn(true);
 
             //Act & Assert
-            var result = assertThrows(FileRequiredException.class, () -> uploadService.upload(UUID.randomUUID(), "title", file, FileType.POWER_OF_ATTORNEY));
+            var result = assertThrows(FileRequiredException.class, () -> uploadService.upload(UUID.randomUUID(), file, FileType.POWER_OF_ATTORNEY));
 
             verify(fileStorageService, times(0)).save(any(MultipartFile.class), any(FileType.class));
             verify(documentsRepository, times(0)).save(any(Document.class));

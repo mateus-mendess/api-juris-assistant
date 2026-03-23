@@ -1,5 +1,6 @@
 package br.com.juristrack.Juris.Track.service;
 
+import br.com.juristrack.Juris.Track.dto.response.UploadResponse;
 import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.exception.FileRequiredException;
 import br.com.juristrack.Juris.Track.mapper.DocumentsMapper;
@@ -11,14 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.plaf.PanelUI;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -33,19 +26,19 @@ public class UploadService {
     private final ClientService clientService;
 
     @Transactional
-    public String upload(UUID id, String fileName, MultipartFile file, FileType type) {
-        validate(file, type);
+    public UploadResponse upload(UUID clientId, MultipartFile file, FileType fileType) {
+        validate(file, fileType);
 
-        Client client = clientService.findById(id);
+        Client client = clientService.findById(clientId);
 
-        String relativePath = fileStorageService.save(file, type);
+        String relativePath = fileStorageService.save(file, fileType);
 
-        Document documents = documentsMapper.toDocument(fileName, relativePath, type);
+        Document documents = documentsMapper.toDocument(file.getOriginalFilename(), relativePath, fileType);
         documents.linkClient(client);
 
-        documentsRepository.save(documents);
+        Document document = documentsRepository.save(documents);
 
-        return relativePath;
+        return documentsMapper.toUploadResponse(document.getId(), document.getFilePath());
     }
 
     private void validate(MultipartFile file, FileType type) {

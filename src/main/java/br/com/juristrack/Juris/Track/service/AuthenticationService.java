@@ -2,8 +2,6 @@ package br.com.juristrack.Juris.Track.service;
 
 import br.com.juristrack.Juris.Track.dto.request.AuthenticationRequest;
 import br.com.juristrack.Juris.Track.dto.response.AuthenticationResponse;
-import br.com.juristrack.Juris.Track.exception.NotFoundException;
-import br.com.juristrack.Juris.Track.model.entity.Attorney;
 import br.com.juristrack.Juris.Track.model.entity.User;
 import br.com.juristrack.Juris.Track.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +33,7 @@ public class AuthenticationService {
         return user;
     }
 
-    public AuthenticationResponse authenticationLocal(AuthenticationRequest authenticationRequest) {
+    public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationRequest.email(), authenticationRequest.password())
         );

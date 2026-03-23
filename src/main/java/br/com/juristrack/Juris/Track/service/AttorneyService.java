@@ -3,6 +3,7 @@ package br.com.juristrack.Juris.Track.service;
 import br.com.juristrack.Juris.Track.dto.request.AttorneyRequest;
 import br.com.juristrack.Juris.Track.dto.request.AttorneyUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.AttorneyResponse;
+import br.com.juristrack.Juris.Track.dto.response.UploadResponse;
 import br.com.juristrack.Juris.Track.enums.AuthProviderType;
 import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
@@ -10,6 +11,7 @@ import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.OabAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.PhoneAlreadyExistsException;
 import br.com.juristrack.Juris.Track.mapper.AttorneyMapper;
+import br.com.juristrack.Juris.Track.mapper.DocumentsMapper;
 import br.com.juristrack.Juris.Track.model.entity.Address;
 import br.com.juristrack.Juris.Track.model.entity.Attorney;
 import br.com.juristrack.Juris.Track.model.entity.User;
@@ -53,7 +55,7 @@ public class AttorneyService {
     }
 
     @Transactional
-    public String uploadPhoto(Jwt jwt, MultipartFile filePhoto) {
+    public UploadResponse uploadPhoto(Jwt jwt, MultipartFile filePhoto) {
         User user = authenticationService.getAuthenticatedUser(jwt);
         Attorney attorney = user.getAttorney();
 
@@ -64,7 +66,7 @@ public class AttorneyService {
 
         attorneyRepository.save(attorney);
 
-        return relativePath;
+        return new UploadResponse(attorney.getId(), relativePath);
     }
 
     @Transactional

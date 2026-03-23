@@ -5,6 +5,8 @@ import br.com.juristrack.Juris.Track.security.service.GoogleOAuth2Service;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +32,12 @@ import java.security.interfaces.RSAPublicKey;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "Bearer",
+        bearerFormat = "JWT"
+)
 public class SecurityConfig {
 
     @Value("${jwt.private.key}")
