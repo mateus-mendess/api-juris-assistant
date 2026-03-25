@@ -62,7 +62,7 @@ public class AttorneyController {
     @PatchMapping("/photo")
     public ResponseEntity<UploadResponse> uploadPhoto(@AuthenticationPrincipal Jwt jwt,
                                                       @Parameter(description = "Photo file to be added or updated", required = true)
-                                                      @RequestParam(name = "file") MultipartFile filePhoto) {
+                                                      @RequestParam(name = "file") MultipartFile filePhoto) throws Exception {
 
         UploadResponse uploadResponse = attorneyService.uploadPhoto(jwt, filePhoto);
 

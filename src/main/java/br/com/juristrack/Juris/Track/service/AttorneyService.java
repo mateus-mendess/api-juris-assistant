@@ -55,11 +55,11 @@ public class AttorneyService {
     }
 
     @Transactional
-    public UploadResponse uploadPhoto(Jwt jwt, MultipartFile filePhoto) {
+    public UploadResponse uploadPhoto(Jwt jwt, MultipartFile filePhoto) throws Exception {
         User user = authenticationService.getAuthenticatedUser(jwt);
         Attorney attorney = user.getAttorney();
 
-        String relativePath = fileStorageService.save(filePhoto, FileType.AVATAR);
+        String relativePath = fileStorageService.uploadS3(filePhoto, FileType.AVATAR);
         fileStorageService.delete(attorney.getProfilePhotoPath());
 
         attorney.setProfilePhotoPath(relativePath);
