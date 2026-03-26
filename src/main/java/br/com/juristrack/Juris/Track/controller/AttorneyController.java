@@ -21,9 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
 
 @RequiredArgsConstructor
 @RestController
@@ -32,11 +29,6 @@ import java.util.Map;
 public class AttorneyController {
 
     private final AttorneyService attorneyService;
-
-    @GetMapping
-    public ResponseEntity<String> getHelloWorld() {
-        return ResponseEntity.ok().body("Hello World!!!");
-    }
 
     @Operation(summary = "Register attorney",
             description = """
