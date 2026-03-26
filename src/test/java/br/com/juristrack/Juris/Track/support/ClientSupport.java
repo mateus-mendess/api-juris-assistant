@@ -1,6 +1,7 @@
 package br.com.juristrack.Juris.Track.support;
 
 import br.com.juristrack.Juris.Track.dto.request.ClientRequest;
+import br.com.juristrack.Juris.Track.dto.response.AddressResponse;
 import br.com.juristrack.Juris.Track.dto.response.ClientResponse;
 import br.com.juristrack.Juris.Track.enums.MaritalStatusType;
 import br.com.juristrack.Juris.Track.model.entity.Address;
@@ -40,9 +41,24 @@ public class ClientSupport {
         return client;
     }
 
-    public static ClientResponse validResponse() {
+    public static ClientResponse validResponse(Address address) {
         return new ClientResponse(
-                validEntity().getId()
+                validEntity().getId(),
+                validEntity().getName(),
+                validEntity().getCpf(),
+                validEntity().getNationality(),
+                validEntity().getMaritalStatus(),
+                validEntity().getWork(),
+                validEntity().getPhone(),
+                new AddressResponse(
+                        address.getStreet(),
+                        address.getNumber(),
+                        address.getNeighborhood(),
+                        address.getComplement(),
+                        address.getCity(),
+                        address.getState(),
+                        address.getZipCode()
+                )
         );
     }
 }

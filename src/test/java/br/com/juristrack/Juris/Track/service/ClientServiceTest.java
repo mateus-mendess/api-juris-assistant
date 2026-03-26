@@ -7,14 +7,12 @@ import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.NotFoundException;
 import br.com.juristrack.Juris.Track.exception.PhoneAlreadyExistsException;
 import br.com.juristrack.Juris.Track.mapper.ClientMapper;
-import br.com.juristrack.Juris.Track.model.entity.Address;
-import br.com.juristrack.Juris.Track.model.entity.Attorney;
-import br.com.juristrack.Juris.Track.model.entity.Client;
-import br.com.juristrack.Juris.Track.model.entity.User;
+import br.com.juristrack.Juris.Track.model.entity.*;
 import br.com.juristrack.Juris.Track.model.repository.ClientRepository;
 import br.com.juristrack.Juris.Track.support.AddressSupport;
 import br.com.juristrack.Juris.Track.support.ClientSupport;
 import br.com.juristrack.Juris.Track.support.AttorneySupport;
+import br.com.juristrack.Juris.Track.support.UserSupport;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +42,9 @@ class ClientServiceTest {
 
     @Mock
     private AttorneyService lawyerService;
+
+    @Mock
+    private AuthenticationService authenticationService;
 
     @Captor
     private ArgumentCaptor<Client> clientArgumentCaptor;
@@ -90,12 +91,13 @@ class ClientServiceTest {
             AddressRequest addressRequest = AddressSupport.validRequest();
             Client clientEntity = ClientSupport.validEntity();
             Address addressEntity = AddressSupport.validEntity();
+            User user = UserSupport.validEntity(new Role());
             Attorney attorney = AttorneySupport.validEntity(new User(), addressEntity);
-            ClientResponse response = ClientSupport.validResponse();
+            ClientResponse response = ClientSupport.validResponse(addressEntity);
 
             when(clientRepository.existsByCpf(clientrequest.cpf())).thenReturn(false);
             when(clientRepository.existsByPhone(clientrequest.phone())).thenReturn(false);
-            when(lawyerService.getAuthenticatedLawyer(jwt)).thenReturn(attorney);
+            when(authenticationService.getAuthenticatedUser(jwt)).thenReturn(user);
             when(addressService.buildAddress(addressRequest)).thenReturn(addressEntity);
             when(clientMapper.toClient(clientrequest)).thenReturn(clientEntity);
             when(clientRepository.save(clientEntity)).thenReturn(clientEntity);
@@ -104,7 +106,7 @@ class ClientServiceTest {
             //Act & Assert
             var result = assertDoesNotThrow(() -> clientService.save(clientrequest, jwt));
 
-            verify(lawyerService).getAuthenticatedLawyer(jwt);
+            verify(authenticationService).getAuthenticatedUser(jwt);
             verify(addressService).buildAddress(addressRequest);
             verify(clientRepository).save(clientArgumentCaptor.capture());
 

@@ -48,10 +48,11 @@ class UploadServiceTest {
             Client client = ClientSupport.validEntity();
             Document documents = DocumentsSupport.validEntity(client);
 
+            when(file.getOriginalFilename()).thenReturn("file.png");
             when(clientService.findById(client.getId())).thenReturn(client);
             when(fileStorageService.save(any(MultipartFile.class), any(FileType.class))).thenReturn("/folder/filename");
             when(documentsMapper.toDocument(any(String.class), any(String.class), any(FileType.class))).thenReturn(documents);
-            when(documentsRepository.save(documents)).thenReturn(documents);
+            when(documentsRepository.save(any(Document.class))).thenReturn(documents);
 
             //Act & Assert
             assertDoesNotThrow(() -> uploadService.upload(client.getId(), file, FileType.CONTRACT));

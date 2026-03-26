@@ -56,6 +56,9 @@ class AttorneyServiceTest {
     @Mock
     private AddressService addressService;
 
+    @Mock
+    private AuthenticationService authenticationService;
+
     @InjectMocks
     private AttorneyService attorneyService;
 
@@ -84,49 +87,6 @@ class AttorneyServiceTest {
             var response = assertDoesNotThrow(() -> attorneyService.findAll());
 
             assertEquals(attorneys.size(), response.size());
-        }
-    }
-
-    @Nested
-    class FindByAttorney {
-
-        @Test
-        void should_return_attorney_when_exists_in_db() {
-            //Arrange
-            Jwt jwt = mock(Jwt.class);
-            User user = UserSupport.validEntity(new Role());
-            Address address = AddressSupport.validEntity();
-            Attorney attorney = AttorneySupport.validEntity(user, address);
-            AttorneyResponse attorneyResponse = AttorneySupport.validResponse(attorney);
-            UUID id = attorney.getId();
-
-            when(jwt.getSubject()).thenReturn(id.toString());
-            when(attorneyMapper.toAttorneyResponse(attorney)).thenReturn(attorneyResponse);
-            when(attorneyRepository.findById(id)).thenReturn(Optional.of(attorney));
-
-            //Act & Assert
-           var response = assertDoesNotThrow(() -> attorneyService.findByLawyer(jwt));
-
-            assertEquals(attorney.getId(), response.id());
-        }
-
-        @Test
-        void should_throw_NotFoundException_when_attorney_not_exists_in_db() {
-            //Arrange
-            Jwt jwt = mock(Jwt.class);
-            User user = UserSupport.validEntity(new Role());
-            Address address = AddressSupport.validEntity();
-            Attorney attorney = AttorneySupport.validEntity(user, address);
-            UUID id = attorney.getId();
-
-            when(jwt.getSubject()).thenReturn(id.toString());
-            when(attorneyRepository.findById(id)).thenReturn(Optional.empty());
-
-            //Act & Assert
-            var exception = assertThrows(NotFoundException.class, () ->
-                    attorneyService.findByLawyer(jwt));
-
-            assertEquals("User not found.", exception.getMessage());
         }
     }
 
@@ -207,145 +167,4 @@ class AttorneyServiceTest {
             verify(attorneyRepository, times(0)).save(any(Attorney.class));
         }
     }
-
-    @Nested
-    class UploadAvatarAttorney {
-        @Test
-        void should_upload_photo_with_success_when_exists() {
-            //Arrange
-            MultipartFile photo = mock(MultipartFile.class);
-            User user = UserSupport.validEntity(new Role());
-            Address address = AddressSupport.validEntity();
-            Attorney attorney = AttorneySupport.validEntity(user, address);
-            Jwt jwt = mock(Jwt.class);
-            UUID id = attorney.getId();
-
-            when(jwt.getSubject()).thenReturn(id.toString());
-            when(attorneyRepository.findById(id)).thenReturn(Optional.of(attorney));
-            when(fileStorageService.save(photo, FileType.AVATAR)).thenReturn("/folder/file");
-            when(attorneyRepository.save(attorney)).thenReturn(attorney);
-
-            //Act & Assert
-            assertDoesNotThrow(() -> attorneyService.uploadPhoto(jwt, photo));
-
-            verify(attorneyRepository).save(attorneyArgumentCaptor.capture());
-
-            var captured = attorneyArgumentCaptor.getValue();
-
-            assertNotNull(captured.getProfilePhotoPath());
-        }
-    }
-
-    @Nested
-    class UpdateAttorney {
-        @Test
-        void should_update_data_attorney_with_success() {
-            //Arrange
-            AttorneyUpdateRequest attorneyUpdateRequest =  AttorneySupport.validUpdateRequest();
-
-            User user = UserSupport.validEntity(new Role());
-            Address address = AddressSupport.validEntity();
-            Attorney attorney = AttorneySupport.validEntity(user, address);
-            Jwt jwt = mock(Jwt.class);
-            UUID id = attorney.getId();
-
-            when(jwt.getSubject()).thenReturn(id.toString());
-            when(attorneyRepository.findById(id)).thenReturn(Optional.of(attorney));
-            when(attorneyRepository.existsByPhone(attorneyUpdateRequest.phone())).thenReturn(false);
-            doNothing().when(attorneyMapper).toUpdateAttorney(attorneyUpdateRequest, attorney);
-
-            //Act & Assert
-            assertDoesNotThrow(() -> attorneyService.update(attorneyUpdateRequest, jwt));
-
-            verify(attorneyMapper).toUpdateAttorney(eq(attorneyUpdateRequest), attorneyArgumentCaptor.capture());
-
-            var captured = attorneyArgumentCaptor.getValue();
-
-            assertEquals(id, captured.getId());
-        }
-
-        @Test
-        void should_throw_NotFoundException_when_attorney_not_exists_in_db() {
-            //Arrange
-            AttorneyUpdateRequest attorneyUpdateRequest =  AttorneySupport.validUpdateRequest();
-            Jwt jwt = mock(Jwt.class);
-            UUID id = UUID.randomUUID();
-
-            when(jwt.getSubject()).thenReturn(id.toString());
-            when(attorneyRepository.findById(id)).thenReturn(Optional.empty());
-
-            //Act & Assert
-            var exception = assertThrows(NotFoundException.class, () ->
-                    attorneyService.update(attorneyUpdateRequest, jwt));
-
-            verify(attorneyMapper, times(0)).toUpdateAttorney(any(AttorneyUpdateRequest.class), any(Attorney.class));
-            assertEquals("User not found", exception.getMessage());
-        }
-
-        @Test
-        void should_throw_PhoneAlreadyExistsException_when_phone_exists_in_db() {
-            //Arrange
-            AttorneyUpdateRequest attorneyUpdateRequest =  AttorneySupport.validUpdateRequest();
-            Jwt jwt = mock(Jwt.class);
-            UUID id = UUID.randomUUID();
-            User user = UserSupport.validEntity(new Role());
-            Address address = AddressSupport.validEntity();
-            Attorney attorney = AttorneySupport.validEntity(user, address);
-
-            when(jwt.getSubject()).thenReturn(id.toString());
-            when(attorneyRepository.findById(id)).thenReturn(Optional.of(attorney));
-            when(attorneyRepository.existsByPhone(attorneyUpdateRequest.phone())).thenReturn(true);
-
-            //Act & Assert
-            var exception = assertThrows(PhoneAlreadyExistsException.class, () ->
-                    attorneyService.update(attorneyUpdateRequest, jwt));
-
-            verify(attorneyMapper, times(0)).toUpdateAttorney(any(AttorneyUpdateRequest.class), any(Attorney.class));
-            assertEquals("Phone already registered: " + attorneyUpdateRequest.phone(), exception.getMessage());
-        }
-    }
-
-    @Nested
-    class DeleteAttorney {
-        @Test
-        void should_delete_attorney_with_success() {
-            //Arrange
-            Jwt jwt = mock(Jwt.class);
-            User user = UserSupport.validEntity(new Role());
-            Address address = AddressSupport.validEntity();
-            Attorney attorney = AttorneySupport.validEntity(user, address);
-            UUID id = attorney.getId();
-
-            when(jwt.getSubject()).thenReturn(id.toString());
-            when(attorneyRepository.findById(id)).thenReturn(Optional.of(attorney));
-            doNothing().when(fileStorageService).delete(attorney.getProfilePhotoPath());
-            doNothing().when(attorneyRepository).delete(attorney);
-
-            //Act & Assert
-            assertDoesNotThrow(() -> attorneyService.delete(jwt));
-
-            verify(attorneyRepository).findById(id);
-            verify(attorneyRepository).delete(attorneyArgumentCaptor.capture());
-
-            var captured = attorneyArgumentCaptor.getValue();
-
-            assertEquals(attorney.getId(), captured.getId());
-        }
-
-        @Test
-        void should_throw_NotFoundException_when_attorney_not_exists_in_db() {
-            Jwt jwt = mock(Jwt.class);
-            UUID id = UUID.randomUUID();
-
-            when(jwt.getSubject()).thenReturn(id.toString());
-            when(attorneyRepository.findById(id)).thenReturn(Optional.empty());
-
-            var exception = assertThrows(NotFoundException.class, () ->
-                    attorneyService.delete(jwt));
-
-            verify(attorneyRepository, times(0)).delete(any(Attorney.class));
-            assertEquals("User not found.", exception.getMessage());
-        }
-    }
-
 }

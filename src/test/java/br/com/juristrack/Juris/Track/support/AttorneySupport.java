@@ -9,6 +9,7 @@ import br.com.juristrack.Juris.Track.model.entity.User;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class AttorneySupport {
@@ -36,7 +37,8 @@ public class AttorneySupport {
                 "AL",
                 "99450-6070",
                 "folder/nomeArquivo.type",
-                address
+                address,
+                new HashSet<>()
         );
     }
 
@@ -51,7 +53,6 @@ public class AttorneySupport {
 
     public static AttorneyUpdateRequest validUpdateRequest() {
         return new AttorneyUpdateRequest(
-                "83",
                 "99240-1010"
         );
     }

@@ -33,6 +33,11 @@ public class AttorneyController {
 
     private final AttorneyService attorneyService;
 
+    @GetMapping
+    public ResponseEntity<String> getHelloWorld() {
+        return ResponseEntity.ok().body("Hello World!!!");
+    }
+
     @Operation(summary = "Register attorney",
             description = """
                     Registers a new attorney in the system. The CPF (Brazilian individual taxpayer registry) and 
