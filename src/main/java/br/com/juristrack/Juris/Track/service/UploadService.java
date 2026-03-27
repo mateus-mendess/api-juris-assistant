@@ -26,12 +26,12 @@ public class UploadService {
     private final ClientService clientService;
 
     @Transactional
-    public UploadResponse upload(UUID clientId, MultipartFile file, FileType fileType) {
+    public UploadResponse upload(UUID clientId, MultipartFile file, FileType fileType) throws Exception {
         validate(file, fileType);
 
         Client client = clientService.findById(clientId);
 
-        String relativePath = fileStorageService.save(file, fileType);
+        String relativePath = fileStorageService.uploadS3(file, fileType);
 
         Document documents = documentsMapper.toDocument(file.getOriginalFilename(), relativePath, fileType);
         documents.linkClient(client);

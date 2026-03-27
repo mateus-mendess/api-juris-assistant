@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class UploadController {
                                                           @Parameter(description = "File to be uploaded (client document)", required = true)
                                                           @RequestParam(name = "file") MultipartFile file,
                                                           @Parameter(description = "Type of the document being uploaded", required = true)
-                                                          @RequestParam(name = "fileType") FileType fileType) {
+                                                          @RequestParam(name = "fileType") FileType fileType) throws Exception{
 
         UploadResponse uploadResponse = uploadService.upload(clientId, file, fileType);
 

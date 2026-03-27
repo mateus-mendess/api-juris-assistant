@@ -1,0 +1,3 @@
+INSERT INTO roles("name") VALUES
+('ROLE_ATTORNEY'),
+('ROLE_ADMIN');
