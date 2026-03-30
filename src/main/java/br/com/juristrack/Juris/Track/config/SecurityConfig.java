@@ -8,7 +8,6 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -40,11 +39,9 @@ import java.security.interfaces.RSAPublicKey;
 )
 public class SecurityConfig {
 
-    @Value("${jwt.private.key}")
-    private RSAPrivateKey privateKey;
+    private final RSAPrivateKey privateKey;
 
-    @Value("${jwt.public.key}")
-    private RSAPublicKey publicKey;
+    private final RSAPublicKey publicKey;
 
     @Order(1)
     @Bean
@@ -70,6 +67,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/attorney").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/clients/{id}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(auth -> auth.jwt(Customizer.withDefaults()))

@@ -1,13 +1,10 @@
 package br.com.juristrack.Juris.Track.service;
 
 import br.com.juristrack.Juris.Track.dto.request.AttorneyRequest;
-import br.com.juristrack.Juris.Track.dto.request.AttorneyUpdateRequest;
 import br.com.juristrack.Juris.Track.dto.response.AttorneyResponse;
 import br.com.juristrack.Juris.Track.enums.AuthProviderType;
-import br.com.juristrack.Juris.Track.enums.FileType;
 import br.com.juristrack.Juris.Track.enums.RolesType;
 import br.com.juristrack.Juris.Track.exception.CpfAlreadyExistsException;
-import br.com.juristrack.Juris.Track.exception.NotFoundException;
 import br.com.juristrack.Juris.Track.exception.OabAlreadyExistsException;
 import br.com.juristrack.Juris.Track.exception.PhoneAlreadyExistsException;
 import br.com.juristrack.Juris.Track.mapper.AttorneyMapper;
@@ -27,13 +24,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;

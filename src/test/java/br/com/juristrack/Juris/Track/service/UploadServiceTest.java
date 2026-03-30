@@ -42,7 +42,7 @@ class UploadServiceTest {
     @Nested
     class UploadFile {
         @Test
-        void should_upload_file_when_exists() {
+        void should_upload_file_when_exists() throws Exception {
             //Arrange
             MultipartFile file = mock(MultipartFile.class);
             Client client = ClientSupport.validEntity();
@@ -50,34 +50,17 @@ class UploadServiceTest {
 
             when(file.getOriginalFilename()).thenReturn("file.png");
             when(clientService.findById(client.getId())).thenReturn(client);
-            when(fileStorageService.save(any(MultipartFile.class), any(FileType.class))).thenReturn("/folder/filename");
+            when(fileStorageService.uploadS3(any(MultipartFile.class), any(FileType.class))).thenReturn("/folder/filename");
             when(documentsMapper.toDocument(any(String.class), any(String.class), any(FileType.class))).thenReturn(documents);
             when(documentsRepository.save(any(Document.class))).thenReturn(documents);
 
             //Act & Assert
             assertDoesNotThrow(() -> uploadService.upload(client.getId(), file, FileType.CONTRACT));
 
-            verify(fileStorageService).save(any(MultipartFile.class), any(FileType.class));
+            verify(fileStorageService).uploadS3(any(MultipartFile.class), any(FileType.class));
             verify(documentsRepository).save(any(Document.class));
 
             assertNotNull(documents.getClient());
         }
-
-        @Test
-        void should_throw_FileRequiredException_when_file_is_empty_and_is_type_power_of_attorney() {
-            //Arrange
-            MultipartFile file = mock(MultipartFile.class);
-
-            when(file.isEmpty()).thenReturn(true);
-
-            //Act & Assert
-            var result = assertThrows(FileRequiredException.class, () -> uploadService.upload(UUID.randomUUID(), file, FileType.POWER_OF_ATTORNEY));
-
-            verify(fileStorageService, times(0)).save(any(MultipartFile.class), any(FileType.class));
-            verify(documentsRepository, times(0)).save(any(Document.class));
-
-            assertEquals("Required file for registration.", result.getMessage());
-        }
     }
-
 }

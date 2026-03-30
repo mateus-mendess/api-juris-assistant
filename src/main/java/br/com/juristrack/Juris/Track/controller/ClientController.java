@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -25,6 +26,11 @@ import java.net.URI;
 public class ClientController {
 
     private final ClientService clientService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientResponse> getClient(@PathVariable UUID id) {
+        return ResponseEntity.ok().body(clientService.findByIdClient(id));
+    }
 
     @Operation(summary = "Register client",
             description = """

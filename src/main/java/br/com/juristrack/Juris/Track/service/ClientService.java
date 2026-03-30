@@ -32,6 +32,11 @@ public class ClientService {
                 .orElseThrow(() -> new NotFoundException("Client not found."));
     }
 
+    public ClientResponse findByIdClient(UUID id) {
+        return clientMapper.toClientResponse(clientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("client not found")));
+    }
+
     @Transactional
     public ClientResponse save(ClientRequest request, Jwt jwt) {
         validateRegistrationData(request.cpf(), request.phone());
