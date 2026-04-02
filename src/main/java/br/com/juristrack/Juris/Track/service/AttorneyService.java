@@ -58,7 +58,7 @@ public class AttorneyService {
         User user = authenticationService.getAuthenticatedUser(jwt);
         Attorney attorney = user.getAttorney();
 
-        String relativePath = fileStorageService.uploadS3(filePhoto, FileType.AVATAR);
+        String relativePath = fileStorageService.uploadFile(filePhoto, FileType.AVATAR);
 
         attorney.setProfilePhotoPath(relativePath);
 

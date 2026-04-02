@@ -1,5 +1,6 @@
 package br.com.juristrack.Juris.Track.config;
 
+import br.com.juristrack.Juris.Track.exception.FileRequiredException;
 import br.com.juristrack.Juris.Track.handler.AuthSuccessHandler;
 import br.com.juristrack.Juris.Track.security.service.GoogleOAuth2Service;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -8,6 +9,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -25,8 +27,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 @RequiredArgsConstructor
 @Configuration
@@ -39,9 +45,11 @@ import java.security.interfaces.RSAPublicKey;
 )
 public class SecurityConfig {
 
-    private final RSAPrivateKey privateKey;
+    @Value("${jwt.private.key}")
+    private String privateKeyValue;
 
-    private final RSAPublicKey publicKey;
+    @Value("${jwt.public.key}")
+    private String publicKeyValue;
 
     @Order(1)
     @Bean
@@ -75,12 +83,34 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
+    public RSAPrivateKey privateKey() {
+        try {
+            byte[] decoded = Base64.getMimeDecoder().decode(privateKeyValue);
+
+            return (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(decoded));
+        } catch (Exception exception) {
+            throw new IllegalStateException("Error", exception);
+        }
+    }
+
+    @Bean
+    public RSAPublicKey publicKey() {
+        try {
+            byte[] decoded = Base64.getMimeDecoder().decode(publicKeyValue);
+
+            return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(decoded));
+        } catch (Exception exception) {
+            throw new IllegalStateException("Error", exception);
+        }
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(RSAPublicKey publicKey) {
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() {
+    public JwtEncoder jwtEncoder(RSAPublicKey publicKey, RSAPrivateKey privateKey) {
         var jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
         var jwkSet = new ImmutableJWKSet<>(new JWKSet(jwk));
 

@@ -27,11 +27,6 @@ public class ClientController {
 
     private final ClientService clientService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ClientResponse> getClient(@PathVariable UUID id) {
-        return ResponseEntity.ok().body(clientService.findByIdClient(id));
-    }
-
     @Operation(summary = "Register client",
             description = """
                     Registers a new client in the system. The CPF (Brazilian individual taxpayer registry)

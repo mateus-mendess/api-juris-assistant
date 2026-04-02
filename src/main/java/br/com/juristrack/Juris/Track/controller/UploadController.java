@@ -2,7 +2,7 @@ package br.com.juristrack.Juris.Track.controller;
 
 import br.com.juristrack.Juris.Track.dto.response.UploadResponse;
 import br.com.juristrack.Juris.Track.enums.FileType;
-import br.com.juristrack.Juris.Track.service.UploadService;
+import br.com.juristrack.Juris.Track.service.DocumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @Tag(name = "Documents", description = "Operations related to document management for clients.")
 public class UploadController {
 
-    private final UploadService uploadService;
+    private final DocumentService documentService;
 
     @Operation(summary = "Upload client document", description = "Uploads a document associated with a specific client.")
     @ApiResponses({
@@ -41,10 +41,24 @@ public class UploadController {
                                                           @Parameter(description = "Type of the document being uploaded", required = true)
                                                           @RequestParam(name = "fileType") FileType fileType) throws Exception{
 
-        UploadResponse uploadResponse = uploadService.upload(clientId, file, fileType);
+        UploadResponse uploadResponse = documentService.uploadFileFromS3(clientId, file, fileType);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(uploadResponse.id()).toUri();
 
         return ResponseEntity.created(uri).body(uploadResponse);
+    }
+
+    @Operation(summary = "delete client document")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Document deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Document not found")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDocuments(@PathVariable UUID id) {
+        documentService.removeFileFromS3(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
