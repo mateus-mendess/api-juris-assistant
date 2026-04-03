@@ -27,7 +27,8 @@ public class ClientController {
 
     private final ClientService clientService;
 
-    @Operation(summary = "Register client",
+    @Operation(
+            summary = "Register client",
             description = """
                     Registers a new client in the system. The CPF (Brazilian individual taxpayer registry)
                     must be unique and not previously registered.

@@ -30,7 +30,8 @@ public class AttorneyController {
 
     private final AttorneyService attorneyService;
 
-    @Operation(summary = "Register attorney",
+    @Operation(
+            summary = "Register attorney",
             description = """
                     Registers a new attorney in the system. The CPF (Brazilian individual taxpayer registry) and 
                     OAB (Brazilian Bar Association registration number) must be unique and not previously registered.
@@ -49,7 +50,9 @@ public class AttorneyController {
         return ResponseEntity.created(uri).build();
     }
 
-    @Operation(summary = "Upload or update attorney profile photo", description = "Uploads or replaces the profile picture of the authenticated attorney.")
+    @Operation(
+            summary = "Upload or update attorney profile photo",
+            description = "Uploads or replaces the profile picture of the authenticated attorney.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Photo added or updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid file"),
@@ -66,7 +69,9 @@ public class AttorneyController {
         return ResponseEntity.ok().body(uploadResponse);
     }
 
-    @Operation(summary = "Update attorney profile", description = "Updates profile information for the authenticated attorney.")
+    @Operation(
+            summary = "Update attorney profile",
+            description = "Updates profile information for the authenticated attorney.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Data updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid update"),
@@ -82,7 +87,27 @@ public class AttorneyController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Delete attorneys", description = "Delete attorneys' accounts using the authentication token.")
+    @Operation(
+            summary = "Delete attorney profile photo",
+            description = "Removes the authenticated attorney's profile photo from storage. " +
+                    "If the attorney does not have a photo, the operation completes without error."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Photo deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing JWT"),
+            @ApiResponse(responseCode = "404", description = "Attorney not found")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("/photo")
+    public ResponseEntity<Void> deletePhoto(@AuthenticationPrincipal Jwt jwt) {
+        attorneyService.deletePhoto(jwt);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Delete attorneys",
+            description = "Delete attorneys' accounts using the authentication token.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Attorney deleted successfully")
     })

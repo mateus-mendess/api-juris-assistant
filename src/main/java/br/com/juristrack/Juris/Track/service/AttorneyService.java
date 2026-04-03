@@ -58,6 +58,10 @@ public class AttorneyService {
         User user = authenticationService.getAuthenticatedUser(jwt);
         Attorney attorney = user.getAttorney();
 
+        if (attorney.getProfilePhotoPath() != null) {
+            fileStorageService.removeFile(attorney.getProfilePhotoPath());
+        }
+
         String relativePath = fileStorageService.uploadFile(filePhoto, FileType.AVATAR);
 
         attorney.setProfilePhotoPath(relativePath);
@@ -65,6 +69,18 @@ public class AttorneyService {
         attorneyRepository.save(attorney);
 
         return new UploadResponse(attorney.getId(), relativePath);
+    }
+
+    @Transactional
+    public void deletePhoto(Jwt jwt) {
+        User user = authenticationService.getAuthenticatedUser(jwt);
+        Attorney attorney = user.getAttorney();
+
+        fileStorageService.removeFile(attorney.getProfilePhotoPath());
+
+        attorney.setProfilePhotoPath(null);
+
+        attorneyRepository.save(attorney);
     }
 
     @Transactional

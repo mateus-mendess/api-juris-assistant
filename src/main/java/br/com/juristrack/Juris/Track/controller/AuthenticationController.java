@@ -23,7 +23,9 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @Operation(summary = "Authenticate attorney", description = "Authenticates an attorney using registered email and password, returning an access token.")
+    @Operation(
+            summary = "Authenticate attorney",
+            description = "Authenticates an attorney using registered email and password, returning an access token.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Authentication successful"),
             @ApiResponse(responseCode = "400", description = "Invalid request data"),

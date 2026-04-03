@@ -26,7 +26,9 @@ public class UploadController {
 
     private final DocumentService documentService;
 
-    @Operation(summary = "Upload client document", description = "Uploads a document associated with a specific client.")
+    @Operation(
+            summary = "Upload client document",
+            description = "Uploads a document associated with a specific client.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Document uploaded successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data"),
@@ -48,15 +50,18 @@ public class UploadController {
         return ResponseEntity.created(uri).body(uploadResponse);
     }
 
-    @Operation(summary = "delete client document")
+    @Operation(
+            summary = "Delete document by ID",
+            description = "Deletes a document from the system and removes the associated file from S3 storage."
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Document deleted successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing JWT"),
             @ApiResponse(responseCode = "404", description = "Document not found")
     })
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocuments(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteDocument(@PathVariable UUID id) {
         documentService.removeFileFromS3(id);
 
         return ResponseEntity.noContent().build();
